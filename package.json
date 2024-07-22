@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/username/my-package.git"
+        "url": "git+https://github.com/ShiroNexo/nexo-aio-downloader.git"
     },
     "keywords": [
         "instagram",
@@ -33,7 +33,7 @@
     ],
     "author": "shironexo",
     "license": "MIT",
-    "homepage": "https://github.com/username/my-package#readme",
+    "homepage": "https://github.com/ShiroNexo/nexo-aio-downloader#readme",
     "dependencies": {
         "@distube/ytdl-core": "^4.13.5",
         "axios": "^1.7.2",
