@@ -1,4 +1,5 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 const qs = require('qs');
 
 const HEADERS = {
@@ -102,23 +103,22 @@ function extractPostInfo(mediaData) {
     }
 };
 
-async function instagramDownloader(url, proxy = null) {
+async function directScrape(url, proxy = null) {
     try {
-    const postId = getInstagramPostId(url);
-    if (!postId) {
-        throw new Error('Invalid Instagram URL');
-    }
+        const postId = getInstagramPostId(url);
+        if (!postId) {
+            throw new Error('Invalid Instagram URL');
+        }
 
-    const data = await getPostGraphqlData(postId, proxy);
-    const mediaData = data.data?.xdt_shortcode_media;
+        const data = await getPostGraphqlData(postId, proxy);
+        const mediaData = data.data?.xdt_shortcode_media;
 
-    if (!mediaData) {
-        return null;
-    }
+        if (!mediaData) {
+            return null;
+        }
 
-    return extractPostInfo(mediaData);
+        return extractPostInfo(mediaData);
     } catch (error) {
-        console.error('Instagram Downloader Error:\n', error);
         return {
             creator: '@ShiroNexo',
             status: false,
@@ -126,5 +126,302 @@ async function instagramDownloader(url, proxy = null) {
         };
     }
 };
+
+const varHeaders = {
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'accept-language': 'en-US,en;q=0.9',
+    'cache-control': 'no-cache',
+    'sec-ch-prefers-color-scheme': 'light',
+    'sec-ch-ua': '"Chromium";v="110", "Not A(Brand";v="24", "Microsoft Edge";v="110"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-user': '?1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/124.0.0.0',
+};
+
+let grapHeaders = {
+    'Accept': 'application/json',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Cache-Control': 'no-cache',
+    'Dnt': '1',
+    'Pragma': 'no-cache',
+    'Referer': '',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0',
+    'X-Csrftoken': 'EuZcvVSeiRAC60CJQRrRC6',
+    'X-Ig-App-Id': '936619743392459',
+    'X-Ig-Www-Claim': '0',
+    'X-Requested-With': 'XMLHttpRequest'
+}
+
+async function userGraphql(url) {
+    try {
+        let body = await axios.get(url, {
+            headers: varHeaders,
+        }).then(res => res.data)
+        
+        let user_id = body.match(/<meta\s+property="instapp:owner_user_id"\s+content="(\d+)"/)[1]
+        let video_id = body.match(/instagram:\/\/media\?id=(\d+)/)[1]
+
+        const graphUrl = `https://www.instagram.com/graphql/query/?doc_id=7571407972945935&variables=%7B%22id%22%3A%22${user_id}%22%2C%22include_clips_attribution_info%22%3Afalse%2C%22first%22%3A1000%7D`
+
+        console.log('graphUrl: ', graphUrl)
+        const graph = await axios.get(graphUrl, {
+            method: 'GET',
+            headers: grapHeaders,
+            httpsAgent: httpsProxyAgent
+        }).then(response => response.data)
+
+        // Ambil video dari respons
+        const edges = graph.data.user.edge_owner_to_timeline_media.edges;
+        let videoData = edges.find(edge => edge.node.id === video_id);
+
+        if (!videoData) {
+            return {
+                creator: '@ShiroNexo',
+                status: false,
+                message: 'Video not found'
+            };
+        }
+
+        // Memastikan bahwa videoData.node ada
+        videoData = videoData.node;
+
+        const getUrlFromData = (videoData) => {
+            // Jika videoData memiliki edge_sidecar_to_children, ambil semua video URLs dari children
+            if (videoData.edge_sidecar_to_children) {
+                return videoData.edge_sidecar_to_children.edges
+                    .map(edge => edge.node.video_url || edge.node.display_url); // Ambil video_url dari setiap video
+            }
+        
+            // Jika tidak ada edge_sidecar_to_children, gunakan video_url dari videoData
+            return videoData.video_url ? [videoData.video_url] : [ videoData.display_url ];
+        };
+
+        const listUrl = getUrlFromData(videoData)
+
+        return {
+            creator: '@ShiroNexo',
+            status: true,
+            data: {
+                url: listUrl,
+                caption: videoData['edge_media_to_caption']['edges'].length > 0 ? videoData['edge_media_to_caption']['edges'][0]['node']['text'] : null,
+                username: videoData['owner']['username'],
+                like: videoData['edge_media_preview_like']['count'],
+                comment: videoData['edge_media_to_comment']['count'],
+                isVideo: videoData['is_video'],
+            }
+        };
+    } catch (error) {
+        return {
+            creator: '@ShiroNexo',
+            status: false,
+            message: error.message
+        };
+    }
+}
+
+async function saveIG(query) {
+    try {
+        // Konfigurasi permintaan ke API saveig.app
+        const requestData = {
+            q: query,
+            t: 'media',
+            lang: 'en'
+        };
+
+        const requestHeaders = {
+            Accept: '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Origin: 'https://saveig.app',
+            Referer: 'https://saveig.app/en',
+            'Sec-Ch-Ua': '"Not/A)Brand";v="99", "Microsoft Edge";v="115", "Chromium";v="115"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.183',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        // Membuat instance axios dengan konfigurasi headers
+        const axiosInstance = axios.create({ headers: requestHeaders });
+
+        // Melakukan permintaan POST ke API
+        const [response] = await Promise.all([
+            axiosInstance.post('https://saveig.app/api/ajaxSearch', qs.stringify(requestData))
+        ]);
+
+        // Mengambil data dari respons
+        const responseData = response.data;
+        const htmlContent = responseData.data;
+
+        // Memparsing HTML menggunakan cheerio
+        const $ = cheerio.load(htmlContent);
+        const downloadItems = $('.download-items');
+
+        // Menyimpan hasil download link dan thumbnail
+        const downloadLinks = [];
+        downloadItems.each((index, element) => {
+            const thumbnailLink = $(element).find('.download-items__thumb > img').attr('src');
+            const downloadLink = $(element).find('.download-items__btn > a').attr('href');
+
+            downloadLinks.push(downloadLink );
+        });
+
+        return {
+            creator: '@ShiroNexo',
+            status: true,
+            data: {
+                url: downloadLinks,
+                caption: null,
+                username: null,
+                like: null,
+                comment: null,
+                isVideo: null,
+            }
+        };
+    } catch (error) {
+        return {
+            creator: '@ShiroNexo',
+            status: false,
+            message: error.message
+        };
+    }
+}
+
+function extractData(script) {
+    const regex = /downVideo\('([^']+)'.*?\.mp([34])/g;
+    const regex2 = /window\.open\("([^"]+)"/g;
+
+    let videoUrl = []
+    
+    let match;
+    while ((match = regex.exec(script)) !== null) {
+        const url = match[1];
+        const fileType = match[2];
+    
+        if (fileType === '4') {
+            videoUrl.push('https:' + url);
+        } else if (fileType === '3') {
+            videoUrl.push(url);
+        }
+    }
+
+    while ((match = regex2.exec(script)) !== null) {
+        const url = match[1];
+        videoUrl.push(url);
+    }
+
+    return videoUrl
+}
+
+async function dlpanda(url) {
+    try {
+        let result = await axios.get(`https://dlpanda.com/instagram?url=${url}`).then(response => {
+            return response.data
+        })
+
+        let downloadLinks =  extractData(result)
+        if (downloadLinks.length === 0) {
+            return {
+                creator: '@ShiroNexo',
+                status: false,
+                message: 'No video found'
+            };
+        }
+
+        return {
+            creator: '@ShiroNexo',
+            status: true,
+            data: {
+                url: downloadLinks,
+                caption: null,
+                username: null,
+                like: null,
+                comment: null,
+                isVideo: null,
+            }
+        };
+    } catch (error) {
+        return {
+            creator: '@ShiroNexo',
+            status: false,
+            message: error.message
+        };
+    }
+}
+
+async function instagramDownloader(text, Func) {
+    const methods = [
+        async () => {
+            try {
+                const data = await directScrape(text);
+                if (!data.status) return null;
+
+                return data
+            } catch (error) {
+                console.log(error)
+                console.log("Error using method 1");
+                return null;
+            }
+        },
+        async () => {
+            try {
+                const data = await userGraphql(text);
+                if (!data.status) return null;
+
+                return data
+            } catch (error) {
+                console.log("Error using method 2");
+                return null;
+            }
+        },
+        async () => {
+            try {
+                const data = await saveIG(text);
+                if (!data.status) return null;
+
+                return data
+            } catch (error) {
+                console.log("Error using method 3");
+                return null;
+            }
+        },
+        async () => {
+            try {
+                const data = await dlpanda(text);
+                if (!data.status) return null;
+
+                return data
+            } catch (error) {
+                console.log("Error using method 4");
+                return null;
+            }
+        },
+    ];
+
+    for (const method of methods) {
+        const info = await method();
+        if (info !== null && info.status) {
+            return info;
+        }
+    }
+
+    return {
+        creator: '@ShiroNexo',
+        status: false,
+        message: 'All methods failed'
+    };
+}
 
 module.exports = instagramDownloader;
