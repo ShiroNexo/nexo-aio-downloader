@@ -14,6 +14,7 @@ Still Adding New More...
 - [✅] youtube
 - [✅] googleDrive
 - [✅] sfile
+- [✅] pixiv
 
 # Usage
 
@@ -71,7 +72,7 @@ const quality = 3
 const bitrateList = 9
 
 (async () => {
-    // All In One For Available Sites
+    // Download Custom Quality Youtube
     const youtube = await nexo.youtubeDownloader(youtubeUrl, quality)
     console.log(youtube)
 
@@ -107,6 +108,64 @@ const bitrateList = 9
 })()
 ```
 
+## Pixiv Example
+For R-18 works require cookie
+
+```js
+const nexo = require("nexo-aio-downloader");
+
+// Example Url
+const pixivUrl = 'https://www.pixiv.net/en/artworks/120829610'
+
+// You Can Use The PHPSESSID= Cookie.
+const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example Cookie
+
+(async () => {
+    // Without Cookie
+    const pixiv = await nexo.pixiv(pixivUrl)
+    console.log(pixiv)
+
+    // Download Custom Bitrate Audio
+    const pixiv18 = await nexo.pixiv(pixivUrl, cookie)
+    console.log(pixiv18)
+
+    /**
+    Ouput Example
+    {
+        "creator": "@ShiroNexo",
+        "status": "true,
+        "data": {
+            data: {
+                title: 'ニヤニヤ教授',
+                alt: 'Blue Archive, BlueArchive / ニヤニヤ教授 / July 24th, 2024',
+                user: 'maho',
+                desc: '',
+                like: 146,
+                view: 1161,
+                comment: 2,
+                tags: 'ブルーアーカイブ (Blue Archive), ブルアカ, bluearchive, 블루아카이브, ニヤニヤ教授',
+                result: [ 
+                    {
+                        type: 'gif' // jpg || gif
+                        buffer: <buffer>
+                    }
+                ]
+            }
+        }
+    }
+    **/
+})()
+```
+
+### How To Get Cookie:
+1. Login to pixiv using your account
+2. Open the developer tools (<kbd>F12</kbd>, <kbd>Ctrl+Shift+I</kbd>, or <kbd>Cmd+J</kbd>)
+3. Go to the `Application` tab
+4. Go to the `Storage` section and click on `Cookies`
+5. Look for the `PHPSESSID`
+6. Open the object, right click on value and copy your session token.
+
+![PHPSESSID](https://i.ibb.co.com/ZHq7bPb/Screenshot-2024-07-24-123651.png)
 
 # Example Using Proxy
 For like instagram that have ip limit

@@ -3,6 +3,9 @@ const fsPromises = require('fs').promises;
 const ffmpeg = require('fluent-ffmpeg');
 const ytdl = require('@distube/ytdl-core');
 const path = require('path');
+const os = require('os');
+
+const tempDir = os.tmpdir();
 
 const QUALITY_MAP = {
     1: '160',   // 144p
@@ -33,12 +36,10 @@ async function youtubeDownloader(link, qualityIndex) {
             throw new Error(`No video found with quality '${getQualityLabel(qualityIndex)}'P.`);
         }
 
-        const tempDir = await createTempDirectory();
-
         if (qualityIndex > 7 || quality === 'highestaudio') {
-            return await downloadAudioOnly(info, quality, videoDetails, thumb, tempDir);
+            return await downloadAudioOnly(info, quality, videoDetails, thumb);
         } else {
-            return await downloadVideoWithAudio(info, quality, videoDetails, thumb, tempDir);
+            return await downloadVideoWithAudio(info, quality, videoDetails, thumb);
         }
     } catch (err) {
         console.error('Youtube Downloader Error:\n', err);
@@ -81,13 +82,7 @@ async function chooseFormat(info, quality) {
     return await ytdl.chooseFormat(info.formats, { quality });
 }
 
-async function createTempDirectory() {
-    const tempDir = path.join(process.cwd(), 'temp');
-    await fsPromises.mkdir(tempDir, { recursive: true });
-    return tempDir;
-}
-
-async function downloadAudioOnly(info, quality, videoDetails, thumb, tempDir) {
+async function downloadAudioOnly(info, quality, videoDetails, thumb) {
     const audioStream = ytdl.downloadFromInfo(info, { quality });
     const tempMp3 = path.join(tempDir, `temp_audio_${Date.now()}.mp3`);
 
@@ -101,7 +96,7 @@ async function downloadAudioOnly(info, quality, videoDetails, thumb, tempDir) {
     return createResponse(videoDetails, mp3Buffer, quality, thumb);
 }
 
-async function downloadVideoWithAudio(info, quality, videoDetails, thumb, tempDir) {
+async function downloadVideoWithAudio(info, quality, videoDetails, thumb) {
     const videoStream = ytdl.downloadFromInfo(info, { quality });
     const audioStream = ytdl.downloadFromInfo(info, { quality: 'highestaudio' });
 

@@ -5,8 +5,9 @@ const twitterDownloader = require('./lib/twitter');
 const tiktokDownloader = require('./lib/tiktok');
 const gdriveDownloader = require('./lib/gdrive');
 const sfileDownloader = require('./lib/sfile');
+const pixivDownloader = require('./lib/pixiv');
 
-const allInOne = async (url, proxy = null) => {
+const allInOne = async (url, { proxy = null, cookie = null}) => {
     try {
         if (!/^https?:\/\/[^/]+/.test(url)) throw new Error('Invalid URL');
 
@@ -40,6 +41,8 @@ const allInOne = async (url, proxy = null) => {
                 return await gdriveDownloader(url);
             case 'twitter':
                 return await twitterDownloader(url);
+            case 'pixiv':
+                return await pixivDownloader(url, cookie);
             default:
                 throw new Error('Unsupported site');
         }
@@ -56,5 +59,6 @@ module.exports = {
     instagram: instagramDownloader,
     youtube: youtubeDownloader,
     tiktok: tiktokDownloader,
-    sfile: sfileDownloader
+    sfile: sfileDownloader,
+    pixiv: pixivDownloader
 }

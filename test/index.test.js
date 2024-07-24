@@ -1,4 +1,4 @@
-const { aio } = require('../src/index');
+const nexo = require('../src/index');
 
 const listUrl = {
     twitter: "https://twitter.com/x_cast_x/status/1809598797603041498?t=tXO1JdAR1Avm2BY5wNQX-w&s=19",
@@ -9,9 +9,9 @@ const listUrl = {
     sfile: "https://sfile.mobi/5g9STNCU525"
 }
 
-async function test() {
+async function AIOTest() {
     Object.keys(listUrl).forEach(async (key) => {
-        await aio(listUrl[key]).then((res) => {
+        await nexo.aio(listUrl[key]).then((res) => {
             console.log(`\nTest ${res.status ? 'passed 🟢' : 'failed 🔴'} for ${key}:`);
             console.log(res);
         }).catch((err) => {
@@ -20,4 +20,25 @@ async function test() {
     })
 }
 
-test()
+async function youtubeTest() {
+    nexo.youtube('https://www.youtube.com/watch?v=IOGP3vcbKBg', 2)
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
+async function pixivTest() {
+    nexo.pixiv('https://www.pixiv.net/en/artworks/120829610')
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
+//AIOTest()
+youtubeTest()

@@ -29,7 +29,8 @@
         "twitter",
         "googledrive",
         "capcut",
-        "youTube"
+        "youTube",
+        "pixiv"
     ],
     "author": "shironexo",
     "license": "MIT",
@@ -39,9 +40,12 @@
         "axios": "^1.7.2",
         "cheerio": "^1.0.0-rc.12",
         "fluent-ffmpeg": "^2.1.3",
-        "qs": "^6.12.3"
+        "gifencoder": "^2.0.1",
+        "qs": "^6.12.3",
+        "sharp": "^0.33.4",
+        "unzipper": "^0.12.2"
     },
     "devDependencies": {
-        "mocha": "^8.0.0"
+        "mocha": "^10.7.0"
     }
 }
