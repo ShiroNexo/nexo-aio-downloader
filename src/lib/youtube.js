@@ -4,6 +4,8 @@ const ffmpeg = require('fluent-ffmpeg');
 const ytdl = require('@distube/ytdl-core');
 const path = require('path');
 const os = require('os');
+const axios = require('axios');
+const { join } = require('path');
 
 const tempDir = os.tmpdir();
 
@@ -93,7 +95,7 @@ async function downloadAudioOnly(info, quality, videoDetails, thumb) {
     const mp3Buffer = await fsPromises.readFile(tempMp3);
     await fsPromises.unlink(tempMp3);
 
-    return createResponse(videoDetails, mp3Buffer, quality, thumb);
+    return createResponse(videoDetails, mp3Buffer, quality, thumb, 'mp3');
 }
 
 async function downloadVideoWithAudio(info, quality, videoDetails, thumb) {
@@ -122,7 +124,7 @@ async function downloadVideoWithAudio(info, quality, videoDetails, thumb) {
         fsPromises.unlink(mp4File)
     ]);
 
-    return createResponse(videoDetails, mp4Buffer, quality, thumb);
+    return createResponse(videoDetails, mp4Buffer, quality, thumb, 'mp4');
 }
 
 function streamToFile(stream, filePath) {
@@ -149,7 +151,7 @@ function mergeAudioVideo(audioPath, videoPath, outputPath) {
     });
 }
 
-function createResponse(videoDetails, buffer, quality, thumb) {
+function createResponse(videoDetails, buffer, quality, thumb, type) {
     return {
         creator: '@ShiroNexo',
         status: true,
@@ -165,6 +167,7 @@ function createResponse(videoDetails, buffer, quality, thumb) {
             channel: videoDetails.ownerChannelName,
             uploadDate: videoDetails.uploadDate,
             thumb,
+            type
         },
     };
 }
@@ -173,4 +176,87 @@ function getQualityLabel(qualityIndex) {
     return ['144', '360', '480', '720', '1080', '1440', '2160'][qualityIndex - 1];
 }
 
-module.exports = youtubeDownloader;
+function sanitizeTitle(title) {
+    return title
+        .replace(/[\/\\:*?"<>|]/g, '_') // Ganti karakter yang tidak valid dengan underscore
+        .trim(); // Hapus spasi di awal dan akhir
+}
+
+// Async function which scrapes the data
+async function youtubePlaylistDownloader(url, quality, folderPath = join(process.cwd() + '/temp')) {
+    try {
+        playlistId = url.slice(url.indexOf("list="), url.indexOf("&index"))
+        console.log("Playlist ID: " + playlistId);
+    } catch {
+        console.log("can't extract Playlist ID from URL. Check URL or Code (search for 'playlistId =')")
+        return {
+            creator: '@ShiroNexo',
+            status: false,
+            message: e.message || 'Invalid Playlist URL'
+        }
+    }
+    try {
+        const { data } = await axios.get(url);
+        const htmlStr = data
+        fs.writeFileSync('./keys.txt', htmlStr)
+
+        let arr = htmlStr.split('"watchEndpoint":{"videoId":"')
+        var db = {}
+
+        for (var i = 1; i < arr.length; i++) {
+            let str = arr[i]
+            let eI = str.indexOf('"')
+            if (str.slice(eI,eI+13) != '","playlistId') continue
+            let sstr = str.slice(0, eI)
+            db[sstr] = 1
+        }
+        console.log(Object.keys(db))
+        console.log(Object.keys(db).length)
+        let title = htmlStr.match(/property="og:title" content="(.+?)"/)?.[1]
+
+        let resultPath = []
+        let metadata = []
+
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath);
+            console.log(`Folder ${folderPath} berhasil dibuat.`);
+        }
+        Object.keys(db).forEach(async key => {
+            const info = await ytdl.getInfo(link);
+            const videoTitle = info.videoDetails.title;
+            const testPath = join(folderPath, `${sanitizeTitle(videoTitle)}.`);
+
+            if (fs.existsSync(testPath + '.mp4') || fs.existsSync(testPath + '.mp3')) {
+                console.log(`File ${videoTitle} already exists. Skipping...`);
+                return;
+            }
+            await youtubeDownloader(key, quality)
+                .then(res => {
+                    const filePath = join(folderPath, `${sanitizeTitle(res.data.title)}.${res.data.type}`)
+                    fs.writeFileSync(filePath, res.data.result)
+                    resultPath.push(filePath)
+                    metadata.push(res.data)
+                    console.log(`File ${videoTitle} saved to ${folderPath}`)
+                })
+        })
+
+        return {
+            creator: '@ShiroNexo',
+            status: true,
+            data: {
+                title,
+                resultPath,
+                metadata
+            }
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            creator: '@ShiroNexo',
+            status: false,
+            message: e.message || 'Something went wrong.'
+        }
+    }
+}
+
+module.exports = { youtubeDownloader , youtubePlaylistDownloader }

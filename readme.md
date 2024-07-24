@@ -1,6 +1,6 @@
 # All In One Downloader
 
-Download Media From Multiple Website Using One Repo.
+Download Media From Multiple Website Using One Library.
 
 Allmost all downloader scrape directly from the sites without 3rd api.
 
@@ -46,11 +46,11 @@ const listUrl = {
     console.log(result)
 
     // Instagram Downloader
-    const insta = await nexo.instagramDownloader(listUrl.instagram)
+    const insta = await nexo.instagram(listUrl.instagram)
     console.log(insta)
 
     // Facebook Downloader
-    const fb = await nexo.facebookDownloader(listUrl.facebook)
+    const fb = await nexo.facebook(listUrl.facebook)
     console.log(insta)
 
     // ETC....
@@ -73,11 +73,11 @@ const bitrateList = 9
 
 (async () => {
     // Download Custom Quality Youtube
-    const youtube = await nexo.youtubeDownloader(youtubeUrl, quality)
+    const youtube = await nexo.youtube(youtubeUrl, quality)
     console.log(youtube)
 
     // Download Custom Bitrate Audio
-    const bitList = await nexo.youtubeDownloader(youtubeUrl, bitrateList)
+    const bitList = await nexo.youtube(youtubeUrl, bitrateList)
 
     /**
     Ouput Bitrate Example
@@ -102,7 +102,7 @@ const bitrateList = 9
     }
     **/
 
-    const customAudio =  await nexo.youtubeDownloader(youtubeUrl, 140)
+    const customAudio =  await nexo.youtube(youtubeUrl, 140)
     console.log(customAudio)
     // ETC....
 })()
@@ -166,6 +166,40 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
 6. Open the object, right click on value and copy your session token.
 
 ![PHPSESSID](https://i.ibb.co.com/ZHq7bPb/Screenshot-2024-07-24-123651.png)
+
+## Youtube Playlist Example
+
+```js
+const nexo = require("nexo-aio-downloader");
+
+// Example Url
+const playlistUrl = 'https://www.youtube.com/playlist?list=PL8mG-RkN2uTzbbUgvbn2YzBLLU3wktwo0'
+
+// 1: 144p || 2: 360p || 3: 480p || 4: 720p || 5: 1080p || 6: 1440p || 7: 2160p || 8: highestaudio/mp3/audio
+const quality = 3
+
+// If Null Will Create New ./temp Directory
+const dirPath = './youtube'
+
+(async () => {
+    // The Download Will Saved Into Folder
+    const youtube = await nexo.youtubePlaylist(youtubeUrl, quality, dirPath)
+    console.log(youtube)
+
+    /**
+    Ouput Example
+    {
+        "creator": "@ShiroNexo",
+        "status": "true,
+        "data": {
+            title: 'xxx'
+            resultPath: [ './xx/xx.mp4' ]
+            metadata: { xxx }
+        }
+    }
+    **/
+})()
+```
 
 # Example Using Proxy
 For like instagram that have ip limit

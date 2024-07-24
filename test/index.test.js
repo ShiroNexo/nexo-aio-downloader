@@ -30,6 +30,17 @@ async function youtubeTest() {
         })
 }
 
+async function youtubeShortTest() {
+    nexo.youtube('https://www.youtube.com/shorts/srYn6AwgczE', 2)
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
+
 async function pixivTest() {
     nexo.pixiv('https://www.pixiv.net/en/artworks/120829610')
         .then((res) => {
@@ -41,4 +52,5 @@ async function pixivTest() {
 }
 
 //AIOTest()
-youtubeTest()
+//youtubeTest()
+youtubeShortTest()

@@ -1,11 +1,12 @@
 const instagramDownloader = require('./lib/instagram');
 const facebookDownloader = require('./lib/facebook');
-const youtubeDownloader = require('./lib/youtube');
+const { youtubeDownloader, youtubePlaylistDownloader } = require('./lib/youtube');
 const twitterDownloader = require('./lib/twitter');
 const tiktokDownloader = require('./lib/tiktok');
 const gdriveDownloader = require('./lib/gdrive');
 const sfileDownloader = require('./lib/sfile');
 const pixivDownloader = require('./lib/pixiv');
+const snackDownloader = require('./lib/snack');
 
 const allInOne = async (url, { proxy = null, cookie = null}) => {
     try {
@@ -20,7 +21,10 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
             sfile: /https?:\/\/sfile\.mobi/,
             mediafire: /https?:\/\/(www\.)?mediafire\.com/,
             twitter: /https?:\/\/(www\.)?twitter\.com/,
-            gdrive: /https?:\/\/drive\.google\.com/
+            gdrive: /https?:\/\/drive\.google\.com/,
+            pixiv: /https?:\/\/(www\.)?pixiv\.net/,
+            snack: /https?:\/\/(www\.)?snack\.com/,
+            mega: /https?:\/\/mega\.nz/,
         };
 
         const sites = Object.keys(supportedSites).find(key => supportedSites[key].test(url));
@@ -43,6 +47,10 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
                 return await twitterDownloader(url);
             case 'pixiv':
                 return await pixivDownloader(url, cookie);
+            case 'snack':
+                return await snackDownloader(url);
+            case 'mega':
+                return await megaDownloader(url);
             default:
                 throw new Error('Unsupported site');
         }
@@ -58,7 +66,9 @@ module.exports = {
     facebook: facebookDownloader,
     instagram: instagramDownloader,
     youtube: youtubeDownloader,
+    youtubePlaylist: youtubePlaylistDownloader,
     tiktok: tiktokDownloader,
     sfile: sfileDownloader,
-    pixiv: pixivDownloader
+    pixiv: pixivDownloader,
+    snack: snackDownloader
 }
