@@ -58,6 +58,7 @@ ffmpeg -version
 npm i nexo-aio-downloader
 ```
 
+
 ## Example
 For more example will added in future.
 
@@ -90,6 +91,7 @@ const listUrl = {
     // ETC....
 })()
 ```
+
 
 ## Youtube Example
 
@@ -154,6 +156,7 @@ const dirPath = './youtube'
 })()
 ```
 
+
 ## Pixiv Example
 For R-18 works require cookie
 
@@ -161,7 +164,11 @@ For R-18 works require cookie
 const nexo = require("nexo-aio-downloader");
 
 // Example Url
-const pixivUrl = 'https://www.pixiv.net/en/artworks/120829610'
+const pixivUrl = 'https://www.pixiv.net/en/artworks/120829610'// Support URL And IllustID
+
+//Example Batch Download
+const userUrl = 'https://www.pixiv.net/en/users/25030629' // Support URL And UserID
+const type = 'illust' // illust || manga || novels || mangaSeries || novelSeries || default was illust
 
 // You Can Use The PHPSESSID= Cookie.
 const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example Cookie
@@ -171,35 +178,13 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
     const pixiv = await nexo.pixiv(pixivUrl)
     console.log(pixiv)
 
-    // Download Custom Bitrate Audio
+    // Download using cookie
     const pixiv18 = await nexo.pixiv(pixivUrl, cookie)
     console.log(pixiv18)
 
-    /**
-    Ouput Example
-    {
-        "creator": "@ShiroNexo",
-        "status": "true,
-        "data": {
-            data: {
-                title: 'ニヤニヤ教授',
-                alt: 'Blue Archive, BlueArchive / ニヤニヤ教授 / July 24th, 2024',
-                user: 'maho',
-                desc: '',
-                like: 146,
-                view: 1161,
-                comment: 2,
-                tags: 'ブルーアーカイブ (Blue Archive), ブルアカ, bluearchive, 블루아카이브, ニヤニヤ教授',
-                result: [ 
-                    {
-                        type: 'gif' // jpg || gif
-                        buffer: <buffer>
-                    }
-                ]
-            }
-        }
-    }
-    **/
+    // Download Batch
+    const pixivbatch = await nexo.pixivBatch(pixivUrl, cookie, type)
+    console.log(batch)
 })()
 ```
 
@@ -212,6 +197,7 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
 6. Open the object, right click on value and copy your session token.
 
 ![PHPSESSID](https://i.ibb.co.com/ZHq7bPb/Screenshot-2024-07-24-123651.png)
+
 
 ## Bilibili Example
 
@@ -230,6 +216,7 @@ const quality = '480P' // Default 480P
     console.log(bili)
 })()
 ```
+
 
 # Example Using Proxy
 For like instagram that have ip limit

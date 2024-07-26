@@ -5,7 +5,7 @@ const twitterDownloader = require('./lib/twitter');
 const tiktokDownloader = require('./lib/tiktok');
 const gdriveDownloader = require('./lib/gdrive');
 const sfileDownloader = require('./lib/sfile');
-const pixivDownloader = require('./lib/pixiv');
+const { pixivDownloader, pixivBacthDownloader } = require('./lib/pixiv');
 const snackDownloader = require('./lib/snack');
 const bilibiliDownloader = require('./lib/bilibili');
 
@@ -75,5 +75,6 @@ module.exports = {
     sfile: sfileDownloader,
     pixiv: pixivDownloader,
     snack: snackDownloader,
-    bilibili: bilibiliDownloader
+    bilibili: bilibiliDownloader,
+    pixivBatch: pixivBacthDownloader,
 }
