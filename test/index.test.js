@@ -40,7 +40,6 @@ async function youtubeShortTest() {
         })
 }
 
-
 async function pixivTest() {
     nexo.pixiv('https://www.pixiv.net/en/artworks/120829610')
         .then((res) => {
@@ -51,6 +50,17 @@ async function pixivTest() {
         })
 }
 
+async function biliTest() {
+    nexo.bilibili('https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all')
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
 //AIOTest()
 //youtubeTest()
-youtubeShortTest()
+//youtubeShortTest()
+biliTest()

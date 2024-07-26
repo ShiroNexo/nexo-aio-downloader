@@ -7,14 +7,48 @@ Allmost all downloader scrape directly from the sites without 3rd api.
 # Available Sites
 Still Adding New More...
 
-- [✅] instagram
-- [✅] facebook
-- [✅] tiktok
-- [✅] twitter
-- [✅] youtube
-- [✅] googleDrive
-- [✅] sfile
-- [✅] pixiv
+- [✅] Instagram
+- [✅] Facebook
+- [✅] Tiktok
+- [✅] Twitter
+- [✅] Youtube
+- [✅] GoogleDrive
+- [✅] Sfile
+- [✅] Pixiv
+- [✅] Mega
+- [✅] Snack
+- [✅] Bilibili / Bstation
+
+# Required
+For Youtube & Bilibili you need ffmpeg installed
+
+### LInux Example
+```bash
+sudo apt update
+sudo apt install ffmpeg
+ffmpeg -version
+```
+
+### Windows Example
+
+1. **Download FFmpeg:**
+   - Visit the [FFmpeg Download page](https://ffmpeg.org/download.html).
+   - Click the "Windows" link and choose a build provider like gyan.dev or BtbN.
+
+2. **Extract the ZIP File:**
+   - Download and extract the ZIP file (e.g., `ffmpeg-release-full.7z`) using 7-Zip or WinRAR.
+
+3. **Add to PATH:**
+   - Copy the path to the `bin` folder (e.g., `C:\path\to\ffmpeg\bin`).
+   - Go to "Control Panel" > "System" > "Advanced system settings" > "Environment Variables."
+   - Edit the `Path` variable and add the copied path. Save changes.
+
+4. **Verify Installation:**
+   - Open Command Prompt and run:
+     ```bash
+     ffmpeg -version
+     ```
+
 
 # Usage
 
@@ -65,16 +99,28 @@ const nexo = require("nexo-aio-downloader");
 // Example Url
 const youtubeUrl = 'https://youtu.be/X_-449tJ7ys?si=iZoyMxNfqZC1iYKf'
 
+
+// Playlist Example
+const playlistUrl = 'https://www.youtube.com/playlist?list=PL8mG-RkN2uTzbbUgvbn2YzBLLU3wktwo0'
+
 // 1: 144p || 2: 360p || 3: 480p || 4: 720p || 5: 1080p || 6: 1440p || 7: 2160p || 8: highestaudio/mp3/audio || 9: bitrate List
 const quality = 3
 
 // Check Available Bitrate For Audio
 const bitrateList = 9
 
+// Playlist Need Directory
+// If Null Will Create New ./temp Directory
+const dirPath = './youtube'
+
 (async () => {
     // Download Custom Quality Youtube
     const youtube = await nexo.youtube(youtubeUrl, quality)
     console.log(youtube)
+
+    // The Download Will Saved Into Folder
+    const youtubePlaylist = await nexo.youtubePlaylist(playlistUrl, quality, dirPath)
+    console.log(youtubePlaylist)
 
     // Download Custom Bitrate Audio
     const bitList = await nexo.youtube(youtubeUrl, bitrateList)
@@ -167,37 +213,21 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
 
 ![PHPSESSID](https://i.ibb.co.com/ZHq7bPb/Screenshot-2024-07-24-123651.png)
 
-## Youtube Playlist Example
+## Bilibili Example
 
 ```js
 const nexo = require("nexo-aio-downloader");
 
 // Example Url
-const playlistUrl = 'https://www.youtube.com/playlist?list=PL8mG-RkN2uTzbbUgvbn2YzBLLU3wktwo0'
+const biliUrl = 'https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all
 
-// 1: 144p || 2: 360p || 3: 480p || 4: 720p || 5: 1080p || 6: 1440p || 7: 2160p || 8: highestaudio/mp3/audio
-const quality = 3
-
-// If Null Will Create New ./temp Directory
-const dirPath = './youtube'
+// 144P || 240P || 360P || 480P || 720P
+const quality = '480P' // Default 480P
 
 (async () => {
-    // The Download Will Saved Into Folder
-    const youtube = await nexo.youtubePlaylist(youtubeUrl, quality, dirPath)
-    console.log(youtube)
-
-    /**
-    Ouput Example
-    {
-        "creator": "@ShiroNexo",
-        "status": "true,
-        "data": {
-            title: 'xxx'
-            resultPath: [ './xx/xx.mp4' ]
-            metadata: { xxx }
-        }
-    }
-    **/
+    // Download Custom Quality Youtube
+    const bili = await nexo.bilibili(biliUrl, quality)
+    console.log(bili)
 })()
 ```
 

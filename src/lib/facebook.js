@@ -100,7 +100,7 @@ async function regexUrl(body) {
         return {
             creator: '@ShiroNexo',
             status: false,
-            message: error.message
+            message: error.message || 'Something went wrong'
         }
     }
 }

@@ -7,6 +7,7 @@ const gdriveDownloader = require('./lib/gdrive');
 const sfileDownloader = require('./lib/sfile');
 const pixivDownloader = require('./lib/pixiv');
 const snackDownloader = require('./lib/snack');
+const bilibiliDownloader = require('./lib/bilibili');
 
 const allInOne = async (url, { proxy = null, cookie = null}) => {
     try {
@@ -25,6 +26,7 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
             pixiv: /https?:\/\/(www\.)?pixiv\.net/,
             snack: /https?:\/\/(www\.)?snack\.com/,
             mega: /https?:\/\/mega\.nz/,
+            bilibili: /https?:\/\/(www\.)?bilibili\.tv/,
         };
 
         const sites = Object.keys(supportedSites).find(key => supportedSites[key].test(url));
@@ -51,6 +53,8 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
                 return await snackDownloader(url);
             case 'mega':
                 return await megaDownloader(url);
+            case 'bilibili':
+                return await bilibiliDownloader(url);
             default:
                 throw new Error('Unsupported site');
         }
@@ -70,5 +74,6 @@ module.exports = {
     tiktok: tiktokDownloader,
     sfile: sfileDownloader,
     pixiv: pixivDownloader,
-    snack: snackDownloader
+    snack: snackDownloader,
+    bilibili: bilibiliDownloader
 }
