@@ -21,7 +21,7 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
             youtube: /https?:\/\/(www\.)?youtube\.com|https?:\/\/m\.youtube\.com|https?:\/\/youtu\.be/,
             sfile: /https?:\/\/sfile\.mobi/,
             mediafire: /https?:\/\/(www\.)?mediafire\.com/,
-            twitter: /https?:\/\/(www\.)?twitter\.com/,
+            twitter: /https?:\/\/(www\.)?twitter\.com|https?:\/\/(www\.)?x\.com/,
             gdrive: /https?:\/\/drive\.google\.com/,
             pixiv: /https?:\/\/(www\.)?pixiv\.net/,
             snack: /https?:\/\/(www\.)?snack\.com/,
@@ -41,6 +41,8 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
                 return await youtubeDownloader(url);
             case 'tiktok':
                 return await tiktokDownloader(url);
+            case 'twitter':
+                return await twitterDownloader(url);
             case 'sfile':
                 return await sfileDownloader(url);
             case 'gdrive':
