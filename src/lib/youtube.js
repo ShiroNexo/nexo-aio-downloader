@@ -33,9 +33,24 @@ async function youtubeDownloader(link, qualityIndex) {
         const videoDetails = info.videoDetails;
         const thumb = info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url;
 
-        const format = await chooseFormat(info, quality);
+        if (Array.isArray(quality)) {
+            for (const q of quality) {
+                try {
+                    format = await ytdl.chooseFormat(info.formats, { quality: q });
+                    if (format) {
+                        quality = q;
+                        break;
+                    }
+                } catch (e) {
+                    format = null;
+                }
+            }
+        } else if (qualityIndex <= 7) {
+            format = await ytdl.chooseFormat(info.formats, { quality: quality });
+        }
+
         if (!format && qualityIndex <= 7) {
-            throw new Error(`No video found with quality '${getQualityLabel(qualityIndex)}'P.`);
+            throw new Error(`No Video found with quality '${getQualityLabel(qualityIndex)}'P.`);
         }
 
         if (qualityIndex > 7 || quality === 'highestaudio') {

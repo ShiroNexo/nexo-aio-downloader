@@ -8,6 +8,9 @@ const sfileDownloader = require('./lib/sfile');
 const { pixivDownloader, pixivBacthDownloader } = require('./lib/pixiv');
 const snackDownloader = require('./lib/snack');
 const bilibiliDownloader = require('./lib/bilibili');
+const capcutDownloader = require('./lib/capcut');
+const pinterest = require('./lib/pinterest');
+const megaDownloader = require('./lib/mega');
 
 const allInOne = async (url, { proxy = null, cookie = null}) => {
     try {
@@ -21,12 +24,14 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
             youtube: /https?:\/\/(www\.)?youtube\.com|https?:\/\/m\.youtube\.com|https?:\/\/youtu\.be/,
             sfile: /https?:\/\/sfile\.mobi/,
             mediafire: /https?:\/\/(www\.)?mediafire\.com/,
-            twitter: /https?:\/\/(www\.)?twitter\.com/,
+            twitter: /https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/.+/,
             gdrive: /https?:\/\/drive\.google\.com/,
             pixiv: /https?:\/\/(www\.)?pixiv\.net/,
             snack: /https?:\/\/(www\.)?snack\.com/,
             mega: /https?:\/\/mega\.nz/,
             bilibili: /https?:\/\/(www\.)?bilibili\.tv/,
+            capcut: /https?:\/\/(?:www\.)?capcut\.com\/t\/[a-zA-Z0-9]+/,
+            pinterest: /^https?:\/\/(?:www\.)?(?:pinterest|pinterestcn)\.[\w.]+\/|^https?:\/\/pin\.it\/[\w.-]+/,
         };
 
         const sites = Object.keys(supportedSites).find(key => supportedSites[key].test(url));
@@ -55,6 +60,10 @@ const allInOne = async (url, { proxy = null, cookie = null}) => {
                 return await megaDownloader(url);
             case 'bilibili':
                 return await bilibiliDownloader(url);
+            case 'capcut':
+                return await capcutDownloader(url);
+            case 'pinterest':
+                return await pinterest.download(url);
             default:
                 throw new Error('Unsupported site');
         }
@@ -71,10 +80,13 @@ module.exports = {
     instagram: instagramDownloader,
     youtube: youtubeDownloader,
     youtubePlaylist: youtubePlaylistDownloader,
+    megaDownloader: megaDownloader,
     tiktok: tiktokDownloader,
     sfile: sfileDownloader,
     pixiv: pixivDownloader,
     snack: snackDownloader,
     bilibili: bilibiliDownloader,
     pixivBatch: pixivBacthDownloader,
+    capcut: capcutDownloader,
+    pinterest: pinterest,
 }

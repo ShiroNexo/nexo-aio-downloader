@@ -36,7 +36,7 @@
     "license": "MIT",
     "homepage": "https://github.com/ShiroNexo/nexo-aio-downloader#readme",
     "dependencies": {
-        "@distube/ytdl-core": "^4.16.3",
+        "@distube/ytdl-core": "latest",
         "axios": "^1.7.2",
         "cheerio": "^1.0.0-rc.12",
         "fluent-ffmpeg": "^2.1.3",

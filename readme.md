@@ -18,6 +18,8 @@ Still Adding New More...
 - [✅] Mega
 - [✅] Snack
 - [✅] Bilibili / Bstation
+- [✅] Capcut
+- [✅] Pinterest
 
 # Required
 For Youtube & Bilibili you need ffmpeg installed
@@ -150,7 +152,7 @@ const dirPath = './youtube'
     }
     **/
 
-    const customAudio =  await nexo.youtube(youtubeUrl, 140)
+    const customAudio =  await nexo.youtube(youtubeUrl, 160) // (videoUrl, bitrate)
     console.log(customAudio)
     // ETC....
 })()
@@ -205,15 +207,39 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
 const nexo = require("nexo-aio-downloader");
 
 // Example Url
-const biliUrl = 'https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all
+const biliUrl = 'https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all'
 
 // 144P || 240P || 360P || 480P || 720P
 const quality = '480P' // Default 480P
 
 (async () => {
-    // Download Custom Quality Youtube
+    // Download Custom Quality Bilibili
     const bili = await nexo.bilibili(biliUrl, quality)
     console.log(bili)
+})()
+```
+
+## PINTEREST Example
+
+```js
+const nexo = require("nexo-aio-downloader");
+
+// Example Url
+const pinUrl = 'https://id.pinterest.com/pin/774124930087393/'
+
+(async () => {
+    // Download Pinterest
+    const pinDownload = await nexo.pinterest.download(pinUrl)
+    console.log(pinDownload)
+
+    // Pinterest Search
+    // Size optional
+    const pinSearch = await nexo.pinterest.search('cat', 10)
+    console.log(pinSearch)
+
+    // Pinterest Profile
+    const pinProfile = await nexo.pinterest.profile('anon')
+    console.log(pinProfile)
 })()
 ```
 
