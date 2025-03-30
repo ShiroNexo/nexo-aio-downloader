@@ -80,7 +80,7 @@ module.exports = {
     instagram: instagramDownloader,
     youtube: youtubeDownloader,
     youtubePlaylist: youtubePlaylistDownloader,
-    megaDownloader: megaDownloader,
+    mega: megaDownloader,
     tiktok: tiktokDownloader,
     sfile: sfileDownloader,
     pixiv: pixivDownloader,
