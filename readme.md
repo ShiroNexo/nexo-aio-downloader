@@ -7,19 +7,82 @@ Allmost all downloader scrape directly from the sites without 3rd api.
 # Available Sites
 Still Adding New More...
 
-- [✅] Instagram
-- [✅] Facebook
-- [✅] Tiktok
-- [✅] Twitter
-- [✅] Youtube
-- [✅] GoogleDrive
-- [✅] Sfile
-- [✅] Pixiv
-- [✅] Mega
-- [✅] Snack
-- [✅] Bilibili / Bstation
-- [✅] Capcut
-- [✅] Pinterest
+<table>
+  <tr>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/instagram/FF0000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Instagram</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/facebook/1877F2"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Facebook</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/tiktok/000000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Tiktok</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/x/1DA1F2"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Twitter</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/youtube/FF0000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Youtube</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/googledrive/4285F4"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>GoogleDrive</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="40px">
+      <img src="https://logos-world.net/wp-content/uploads/2024/01/CapCut-Symbol.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Capcut</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/pixiv/2A95FF"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Pixiv</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/mega/F00000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Mega</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://1.bp.blogspot.com/-PuWtJg49s_0/YCPIGwfvu6I/AAAAAAAAD40/qSgEwMEWRB0u8yxozbojxWGChflTDrX8ACLcBGAsYHQ/s1600/Logo%2BSnack%2BVideo.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Snack</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/pinterest/E60023"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Pinterest</b>
+    </td>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/bilibili/00A1D6"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Bilibili</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="40px">
+      <img src="https://sfile.mobi/icon/sfile-icon-192x192.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
+      <b>Sfile</b>
+    </td>
+  </tr>
+</table>
+
+
+
 
 # Required
 For Youtube & Bilibili you need ffmpeg installed
