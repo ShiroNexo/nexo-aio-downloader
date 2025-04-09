@@ -89,4 +89,6 @@ module.exports = {
     pixivBatch: pixivBacthDownloader,
     capcut: capcutDownloader,
     pinterest: pinterest,
+    twitter: twitterDownloader,
+    gdrive: gdriveDownloader,
 }
