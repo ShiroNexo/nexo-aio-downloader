@@ -9,82 +9,79 @@ Still Adding New More...
 
 <table>
   <tr>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/instagram/FF0000" alt="Instagram Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/instagram/FF0000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Instagram</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/facebook/1877F2" alt="Facebook Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/facebook/1877F2"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Facebook</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/tiktok/000000" alt="Tiktok Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/tiktok/000000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Tiktok</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/x/1DA1F2" alt="X (Twitter) Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/x/1DA1F2"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Twitter</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/youtube/FF0000" alt="Youtube Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/youtube/FF0000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Youtube</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/googledrive/4285F4" alt="Google Drive Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/googledrive/4285F4"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>GoogleDrive</b>
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <img src="https://logos-world.net/wp-content/uploads/2024/01/CapCut-Symbol.png" alt="Capcut Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://logos-world.net/wp-content/uploads/2024/01/CapCut-Symbol.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Capcut</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/pixiv/2A95FF" alt="Pixiv Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/pixiv/2A95FF"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Pixiv</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/mega/F00000" alt="Mega Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/mega/F00000"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Mega</b>
     </td>
-    <td align="center">
-      <img src="https://1.bp.blogspot.com/-PuWtJg49s_0/YCPIGwfvu6I/AAAAAAAAD40/qSgEwMEWRB0u8yxozbojxWGChflTDrX8ACLcBGAsYHQ/s1600/Logo%2BSnack%2BVideo.png" alt="Snack Video Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://1.bp.blogspot.com/-PuWtJg49s_0/YCPIGwfvu6I/AAAAAAAAD40/qSgEwMEWRB0u8yxozbojxWGChflTDrX8ACLcBGAsYHQ/s1600/Logo%2BSnack%2BVideo.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Snack</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/pinterest/E60023" alt="Pinterest Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/pinterest/E60023"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Pinterest</b>
     </td>
-    <td align="center">
-      <img src="https://cdn.simpleicons.org/bilibili/00A1D6" alt="Bilibili Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://cdn.simpleicons.org/bilibili/00A1D6"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Bilibili</b>
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <img src="https://sfile.mobi/icon/sfile-icon-192x192.png" alt="Sfile Logo"
-           style="width: 30px; height: 30px; object-fit: contain; display: block; margin: 0 auto 5px auto;" /><br>
+    <td align="center" width="40px">
+      <img src="https://sfile.mobi/icon/sfile-icon-192x192.png"
+           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
       <b>Sfile</b>
     </td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
   </tr>
 </table>
+
+
 
 
 # Required
@@ -157,22 +154,6 @@ const listUrl = {
     console.log(insta)
 
     // ETC....
-    {
-        aio,
-        facebook,
-        instagram,
-        youtube,
-        mega,
-        tiktok,
-        sfile,
-        pixiv,
-        snack,
-        bilibili,
-        capcut,
-        pinterest: {
-            download
-        },
-    }
 })()
 ```
 
