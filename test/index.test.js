@@ -1,7 +1,7 @@
 const nexo = require('../src/index');
 
 const listUrl = {
-    twitter: "https://twitter.com/x_cast_x/status/1809598797603041498?t=tXO1JdAR1Avm2BY5wNQX-w&s=19",
+    twitter: " https://x.com/i/status/1911076115873185971",
     instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
     facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
     tiktok: "https://vm.tiktok.com/ZSYnnbXW7",
@@ -60,7 +60,18 @@ async function biliTest() {
         })
 }
 
+async function twitterTest() {
+    nexo.twitter(listUrl.twitter)
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
 //AIOTest()
 //youtubeTest()
 //youtubeShortTest()
-biliTest()
+//biliTest()
+twitterTest()
