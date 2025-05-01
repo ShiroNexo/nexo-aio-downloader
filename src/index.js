@@ -12,10 +12,8 @@ const capcutDownloader = require('./lib/capcut');
 const pinterest = require('./lib/pinterest');
 const megaDownloader = require('./lib/mega');
 
-const allInOne = async (url, { proxy = null, cookie = null}) => {
+const allInOne = async (url, { proxy = null, cookie = null} = {}) => {
     try {
-        if (!/^https?:\/\/[^/]+/.test(url)) throw new Error('Invalid URL');
-
         const supportedSites = {
             facebook: /https?:\/\/(www\.)?facebook\.com|https?:\/\/m\.facebook\.com|https?:\/\/fb\.watch/,
             scdl: /https?:\/\/(www\.)?soundcloud\.com|https?:\/\/m\.soundcloud\.com/,

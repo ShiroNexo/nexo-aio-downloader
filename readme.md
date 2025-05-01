@@ -2,7 +2,7 @@
 
 Download Media From Multiple Website Using One Library.
 
-Allmost all downloader scrape directly from the sites without 3rd api.
+All downloader scrape directly from the sites without 3rd api.
 
 # Available Sites
 Still Adding New More...

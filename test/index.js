@@ -2,11 +2,11 @@ const nexo = require('../src/index');
 
 const listUrl = {
     twitter: " https://x.com/i/status/1911076115873185971",
-    instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
-    facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
-    tiktok: "https://vt.tiktok.com/ZSYvhPG55/",
-    "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
-    sfile: "https://sfile.mobi/5g9STNCU525",
+    // instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
+    // facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
+    // tiktok: "https://vt.tiktok.com/ZSYvhPG55/",
+    // "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
+    // sfile: "https://sfile.mobi/5g9STNCU525",
     bilibili: "https://www.bilibili.tv/id/video/4794971188762624?bstar_from=bstar-web.homepage.trending.all"
 }
 
@@ -16,6 +16,7 @@ async function AIOTest() {
             console.log(`\nTest ${res.status ? 'passed 🟢' : 'failed 🔴'} for ${key}:`);
             console.log(res);
         }).catch((err) => {
+            console.log(err)
             console.log(`Test failed 🔴 for ${key}:\n${JSON.stringify(err, null, 2)}\n`);
         })
     })
@@ -81,9 +82,9 @@ async function tiktokTest() {
         })
 }
 
-//AIOTest()
+AIOTest()
 //youtubeTest()
 //youtubeShortTest()
-biliTest()
+//biliTest()
 //twitterTest()
 //tiktokTest()
