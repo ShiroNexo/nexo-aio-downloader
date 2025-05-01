@@ -1,11 +1,17 @@
 const fs = require('fs');
 const fsPromises = require('fs').promises;
-const ffmpeg = require('fluent-ffmpeg');
-const ytdl = require('@distube/ytdl-core');
+const { spawn } = require('child_process');
+const ffmpegPath = require('ffmpeg-static');
 const path = require('path');
 const os = require('os');
-const axios = require('axios');
 const { join } = require('path');
+let youtubedl;
+
+try {
+    youtubedl = require('youtube-dl-exec');
+} catch (err) {
+    console.log('youtube-dl-exec not found. YouTube download feature is disabled.');
+}
 
 const tempDir = os.tmpdir();
 
@@ -13,51 +19,51 @@ const QUALITY_MAP = {
     1: '160',   // 144p
     2: '134',   // 360p
     3: '135',   // 480p
-    4: ['302', '136', '247'],  // 720p
-    5: ['303', '248'],         // 1080p
-    6: ['308', '271'],         // 1440p
-    7: ['315', '313'],         // 2160p
-    8: 'highestaudio',
+    4: '136',   // 720p
+    5: '137',   // 1080p
+    6: '264',   // 1440p
+    7: '266',   // 2160p
+    8: 'bestaudio',
     9: 'bitrateList'
 };
 
 async function youtubeDownloader(link, qualityIndex) {
+    if (!youtubedl) {
+        return {
+            status: false,
+            message: `youtube-dl-exec not found, can't download video`,
+        };
+    }
     try {
         let quality = QUALITY_MAP[qualityIndex] || QUALITY_MAP[2];
-        const info = await ytdl.getInfo(link);
 
+        const info = await youtubedl(link, {
+            dumpSingleJson: true,
+            noCheckCertificates: true,
+            noWarnings: true,
+            preferFreeFormats: true,
+            addHeader: ['referer:youtube.com', 'user-agent:googlebot']
+        });
+
+        const videoDetails = info;
+        const thumb = info.thumbnail;
+
+        const tempInfoFile = path.join(tempDir, `info_${Date.now()}.json`);
+        await fsPromises.writeFile(tempInfoFile, JSON.stringify(info));
+
+        let result;
         if (quality === 'bitrateList') {
-            return getBitrateList(info);
-        }
-
-        const videoDetails = info.videoDetails;
-        const thumb = info.player_response.microformat.playerMicroformatRenderer.thumbnail.thumbnails[0].url;
-
-        if (Array.isArray(quality)) {
-            for (const q of quality) {
-                try {
-                    format = await ytdl.chooseFormat(info.formats, { quality: q });
-                    if (format) {
-                        quality = q;
-                        break;
-                    }
-                } catch (e) {
-                    format = null;
-                }
-            }
-        } else if (qualityIndex <= 7) {
-            format = await ytdl.chooseFormat(info.formats, { quality: quality });
-        }
-
-        if (!format && qualityIndex <= 7) {
-            throw new Error(`No Video found with quality '${getQualityLabel(qualityIndex)}'P.`);
-        }
-
-        if (qualityIndex > 7 || quality === 'highestaudio') {
-            return await downloadAudioOnly(info, quality, videoDetails, thumb);
+            result = getBitrateList(info);
+        } else if (qualityIndex > 7 || quality === 'bestaudio') {
+            result = await downloadAudioOnly(tempInfoFile, quality, videoDetails, thumb);
         } else {
-            return await downloadVideoWithAudio(info, quality, videoDetails, thumb);
+            result = await downloadVideoWithAudio(tempInfoFile, quality, videoDetails, thumb);
         }
+
+        await fsPromises.unlink(tempInfoFile);
+
+        return result;
+
     } catch (err) {
         console.error('Youtube Downloader Error:\n', err);
         return {
@@ -70,11 +76,11 @@ async function youtubeDownloader(link, qualityIndex) {
 
 function getBitrateList(info) {
     const bitrateList = info.formats
-        .filter(element => !element.hasVideo && element.hasAudio)
+        .filter(element => element.acodec !== 'none' && element.vcodec === 'none')
         .map(element => ({
-            codec: element.codecs,
-            bitrate: element.audioBitrate,
-            itag: element.itag
+            codec: element.acodec,
+            bitrate: element.abr,
+            format_id: element.format_id
         }))
         .sort((a, b) => b.bitrate - a.bitrate);
 
@@ -85,26 +91,17 @@ function getBitrateList(info) {
     };
 }
 
-async function chooseFormat(info, quality) {
-    if (Array.isArray(quality)) {
-        for (const q of quality) {
-            try {
-                const format = await ytdl.chooseFormat(info.formats, { quality: q });
-                if (format) return format;
-            } catch (e) {
-                // Continue to next quality option
-            }
-        }
-    }
-    return await ytdl.chooseFormat(info.formats, { quality });
-}
-
-async function downloadAudioOnly(info, quality, videoDetails, thumb) {
-    const audioStream = ytdl.downloadFromInfo(info, { quality });
+async function downloadAudioOnly(infoFile, quality, videoDetails, thumb) {
     const tempMp3 = path.join(tempDir, `temp_audio_${Date.now()}.mp3`);
 
     console.log('Downloading audio...');
-    await streamToFile(audioStream, tempMp3);
+    await youtubedl.exec('', {
+        loadInfoJson: infoFile,
+        extractAudio: true,
+        audioFormat: 'mp3',
+        audioQuality: '0',
+        output: tempMp3
+    });
     console.log('Audio download complete.');
 
     const mp3Buffer = await fsPromises.readFile(tempMp3);
@@ -113,58 +110,62 @@ async function downloadAudioOnly(info, quality, videoDetails, thumb) {
     return createResponse(videoDetails, mp3Buffer, quality, thumb, 'mp3');
 }
 
-async function downloadVideoWithAudio(info, quality, videoDetails, thumb) {
-    const videoStream = ytdl.downloadFromInfo(info, { quality });
-    const audioStream = ytdl.downloadFromInfo(info, { quality: 'highestaudio' });
+async function downloadVideoWithAudio(infoFile, quality, videoDetails, thumb) {
+    const baseName = `temp_video_${Date.now()}`;
+    const videoOutput = path.join(tempDir, `${baseName}.fvideo.mp4`);
+    const audioOutput = path.join(tempDir, `${baseName}.faudio.m4a`);
+    const finalOutput = path.join(tempDir, `${baseName}.mp4`);
 
-    const mp4File = path.join(tempDir, `buff_${Date.now()}.mp4`);
-    const tempMp4 = path.join(tempDir, `temp_video_${Date.now()}.mp4`);
-    const tempMp3 = path.join(tempDir, `temp_audio_${Date.now()}.mp4`);
+    try {
+        console.log('Downloading video...');
+        await youtubedl.exec('', {
+            loadInfoJson: infoFile,
+            format: quality,
+            output: videoOutput
+        });
 
-    console.log('Downloading audio and video...');
-    await Promise.all([
-        streamToFile(audioStream, tempMp3),
-        streamToFile(videoStream, tempMp4)
-    ]);
-    console.log('Audio and video download complete.');
+        console.log('Downloading audio...');
+        await youtubedl.exec('', {
+            loadInfoJson: infoFile,
+            format: 'bestaudio',
+            output: audioOutput
+        });
 
-    console.log('Merging audio and video...');
-    await mergeAudioVideo(tempMp3, tempMp4, mp4File);
-    console.log('Merge complete.');
+        console.log('Merging video & audio...');
+        await new Promise((resolve, reject) => {
+            const ffmpeg = spawn(ffmpegPath, [
+                '-i', videoOutput,
+                '-i', audioOutput,
+                '-c:v', 'copy',
+                '-c:a', 'aac',
+                '-strict', 'experimental',
+                finalOutput
+            ]);
 
-    const mp4Buffer = await fsPromises.readFile(mp4File);
-    await Promise.all([
-        fsPromises.unlink(tempMp3),
-        fsPromises.unlink(tempMp4),
-        fsPromises.unlink(mp4File)
-    ]);
+            ffmpeg.on('close', (code) => {
+                if (code === 0) {
+                    console.log('Merge complete.');
+                    resolve();
+                } else {
+                    reject(new Error(`ffmpeg exited with code ${code}`));
+                }
+            });
+        });
 
-    return createResponse(videoDetails, mp4Buffer, quality, thumb, 'mp4');
+        const mp4Buffer = await fsPromises.readFile(finalOutput);
+
+        await fsPromises.unlink(videoOutput);
+        await fsPromises.unlink(audioOutput);
+        await fsPromises.unlink(finalOutput);
+
+        return createResponse(videoDetails, mp4Buffer, quality, thumb, 'mp4');
+
+    } catch (err) {
+        console.error('Error in downloading or merging video and audio:', err);
+        throw err;
+    }
 }
 
-function streamToFile(stream, filePath) {
-    return new Promise((resolve, reject) => {
-        const writeStream = fs.createWriteStream(filePath);
-        stream.pipe(writeStream);
-        stream.on('end', resolve);
-        stream.on('error', reject);
-        writeStream.on('error', reject);
-    });
-}
-
-function mergeAudioVideo(audioPath, videoPath, outputPath) {
-    return new Promise((resolve, reject) => {
-        ffmpeg()
-            .input(audioPath)
-            .input(videoPath)
-            .outputOptions('-c:v copy')
-            .outputOptions('-c:a aac')
-            .outputOptions('-strict experimental')
-            .on('end', resolve)
-            .on('error', reject)
-            .save(outputPath);
-    });
-}
 
 function createResponse(videoDetails, buffer, quality, thumb, type) {
     return {
@@ -176,28 +177,24 @@ function createResponse(videoDetails, buffer, quality, thumb, type) {
             size: buffer.length,
             quality,
             desc: videoDetails.description,
-            views: videoDetails.viewCount,
-            likes: videoDetails.likes,
-            dislikes: videoDetails.dislikes,
-            channel: videoDetails.ownerChannelName,
-            uploadDate: videoDetails.uploadDate,
+            views: videoDetails.view_count,
+            likes: videoDetails.like_count,
+            dislikes: 0,
+            channel: videoDetails.uploader,
+            uploadDate: videoDetails.upload_date,
             thumb,
             type
         },
     };
 }
 
-function getQualityLabel(qualityIndex) {
-    return ['144', '360', '480', '720', '1080', '1440', '2160'][qualityIndex - 1];
-}
-
 function sanitizeTitle(title) {
     return title
-        .replace(/[\/\\:*?"<>|]/g, '_') // Ganti karakter yang tidak valid dengan underscore
-        .trim(); // Hapus spasi di awal dan akhir
+        .replace(/[\/\\:*?"<>|]/g, '_')
+        .trim();
 }
 
-// Async function which scrapes the data
+
 async function youtubePlaylistDownloader(url, quality, folderPath = join(process.cwd() + '/temp')) {
     try {
         playlistId = url.slice(url.indexOf("list="), url.indexOf("&index"))
@@ -221,7 +218,7 @@ async function youtubePlaylistDownloader(url, quality, folderPath = join(process
         for (var i = 1; i < arr.length; i++) {
             let str = arr[i]
             let eI = str.indexOf('"')
-            if (str.slice(eI,eI+13) != '","playlistId') continue
+            if (str.slice(eI, eI + 13) != '","playlistId') continue
             let sstr = str.slice(0, eI)
             db[sstr] = 1
         }
@@ -274,4 +271,7 @@ async function youtubePlaylistDownloader(url, quality, folderPath = join(process
     }
 }
 
-module.exports = { youtubeDownloader , youtubePlaylistDownloader }
+module.exports = {
+    youtubeDownloader,
+    youtubePlaylistDownloader
+}

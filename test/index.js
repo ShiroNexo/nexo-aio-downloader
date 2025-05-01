@@ -4,9 +4,10 @@ const listUrl = {
     twitter: " https://x.com/i/status/1911076115873185971",
     instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
     facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
-    tiktok: "https://vm.tiktok.com/ZSYnnbXW7",
+    tiktok: "https://vt.tiktok.com/ZSYvhPG55/",
     "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
-    sfile: "https://sfile.mobi/5g9STNCU525"
+    sfile: "https://sfile.mobi/5g9STNCU525",
+    bilibili: "https://www.bilibili.tv/id/video/4794971188762624?bstar_from=bstar-web.homepage.trending.all"
 }
 
 async function AIOTest() {
@@ -21,7 +22,7 @@ async function AIOTest() {
 }
 
 async function youtubeTest() {
-    nexo.youtube('https://www.youtube.com/watch?v=IOGP3vcbKBg', 2)
+    nexo.youtube('https://www.youtube.com/watch?v=oOIztBXox60', 2)
         .then((res) => {
             console.log(res);
         })
@@ -51,7 +52,7 @@ async function pixivTest() {
 }
 
 async function biliTest() {
-    nexo.bilibili('https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all')
+    nexo.bilibili(listUrl.bilibili)
         .then((res) => {
             console.log(res);
         })
@@ -70,8 +71,19 @@ async function twitterTest() {
         })
 }
 
+async function tiktokTest() {
+    nexo.tiktok(listUrl.tiktok)
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
 //AIOTest()
 //youtubeTest()
 //youtubeShortTest()
-//biliTest()
-twitterTest()
+biliTest()
+//twitterTest()
+//tiktokTest()

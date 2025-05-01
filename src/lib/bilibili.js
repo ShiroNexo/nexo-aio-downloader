@@ -2,7 +2,8 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const { join } = require('path');
-const ffmpeg = require('fluent-ffmpeg');
+const { spawn } = require('child_process');
+const ffmpegPath = require('ffmpeg-static');
 const os = require('os');
 
 const tempDir = os.tmpdir();
@@ -46,7 +47,7 @@ async function bilibiliDownloader(url, quality = '480P') {
                 codecs: item.video_resource.codecs,
                 size: item.video_resource.size,
                 mime: item.video_resource.mime_type,
-                url: item.video_resource.url || item.video_resource.backup_url[0]
+                url: item.video_resource?.url || item.video_resource?.backup_url?.[0]
             }
         })
 
@@ -101,29 +102,48 @@ function mergeAudioVideo(audioBuffer, videoBuffer) {
         const audioPath = join(tempDir, `${Date.now()}-audio.mp3`);
         const videoPath = join(tempDir, `${Date.now()}-video.mp4`);
         const outputPath = join(tempDir, `${Date.now()}-output.mp4`);
-        
+
         fs.writeFileSync(audioPath, audioBuffer);
         fs.writeFileSync(videoPath, videoBuffer);
-        
-        ffmpeg()
-            .input(audioPath)
-            .input(videoPath)
-            .outputOptions('-c:v copy')
-            .outputOptions('-c:a aac')
-            .outputOptions('-strict experimental')
-            .on('error', (err) => {
-                fs.unlinkSync(audioPath);
-                fs.unlinkSync(videoPath);
-                reject(err);
-            })
-            .on('end', () => {
-                const outputBuffer = fs.readFileSync(outputPath);
-                fs.unlinkSync(audioPath);
-                fs.unlinkSync(videoPath);
-                fs.unlinkSync(outputPath);
-                resolve(outputBuffer);
-            })
-            .save(outputPath);
+
+        const args = [
+            '-i', videoPath,
+            '-i', audioPath,
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-strict', 'experimental',
+            '-y',
+            outputPath
+        ];
+
+        const ffmpeg = spawn(ffmpegPath, args);
+
+        ffmpeg.on('error', (err) => {
+            cleanup();
+            reject(err);
+        });
+
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                try {
+                    const outputBuffer = fs.readFileSync(outputPath);
+                    cleanup();
+                    resolve(outputBuffer);
+                } catch (err) {
+                    cleanup();
+                    reject(err);
+                }
+            } else {
+                cleanup();
+                reject(new Error(`ffmpeg exited with code ${code}`));
+            }
+        });
+
+        function cleanup() {
+            [audioPath, videoPath, outputPath].forEach(path => {
+                if (fs.existsSync(path)) fs.unlinkSync(path);
+            });
+        }
     });
 }
 

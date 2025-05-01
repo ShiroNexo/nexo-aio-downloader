@@ -84,35 +84,8 @@ Still Adding New More...
 
 
 
-# Required
-For Youtube & Bilibili you need ffmpeg installed
-
-### LInux Example
-```bash
-sudo apt update
-sudo apt install ffmpeg
-ffmpeg -version
-```
-
-### Windows Example
-
-1. **Download FFmpeg:**
-   - Visit the [FFmpeg Download page](https://ffmpeg.org/download.html).
-   - Click the "Windows" link and choose a build provider like gyan.dev or BtbN.
-
-2. **Extract the ZIP File:**
-   - Download and extract the ZIP file (e.g., `ffmpeg-release-full.7z`) using 7-Zip or WinRAR.
-
-3. **Add to PATH:**
-   - Copy the path to the `bin` folder (e.g., `C:\path\to\ffmpeg\bin`).
-   - Go to "Control Panel" > "System" > "Advanced system settings" > "Environment Variables."
-   - Edit the `Path` variable and add the copied path. Save changes.
-
-4. **Verify Installation:**
-   - Open Command Prompt and run:
-     ```bash
-     ffmpeg -version
-     ```
+# Required (OPTIONAL)
+> Youtube requires Python 3.7 or above available in your system as python3. Otherwise, the youtube downloader get disable.
 
 
 # Usage
@@ -164,7 +137,7 @@ const listUrl = {
 const nexo = require("nexo-aio-downloader");
 
 // Example Url
-const youtubeUrl = 'https://youtu.be/X_-449tJ7ys?si=iZoyMxNfqZC1iYKf'
+const youtubeUrl = 'https://www.youtube.com/watch?v=oOIztBXox60'
 
 
 // Playlist Example
