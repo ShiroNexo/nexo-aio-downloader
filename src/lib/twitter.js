@@ -152,7 +152,6 @@ function extractMp4s(data) {
     const { core, legacy, views } = data;
     const author = core.user_results.result.legacy.screen_name;
     let description = legacy.full_text.replace(/https:\/\/t\.co\/[a-zA-Z0-9_-]+\s*$/, '').trim();
-    // console.log(legacy.entities.media[0].video_info);
     const listUrl = legacy.entities?.media?.map(media => {
         if (media.type === 'video' || media.type === 'animated_gif') {
             const variants = media.video_info?.variants;
