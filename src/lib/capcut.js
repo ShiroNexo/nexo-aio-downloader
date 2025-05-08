@@ -20,23 +20,41 @@ async function getTemplateId(templateUrl) {
         const redirectedUrl = response.request.res.responseUrl;
 
         if (redirectedUrl) {
-            const redirectedDetailNumericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(\d+)/);
-            if (redirectedDetailNumericIdMatch) {
-                id = redirectedDetailNumericIdMatch[1];
+            // const redirectedDetailNumericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(\d+)/);
+            // if (redirectedDetailNumericIdMatch) {
+            //     id = redirectedDetailNumericIdMatch[1];
+            //     return id;
+            // }
+
+            // const redirectedDetailStringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
+            // if (redirectedDetailStringIdMatch && !id) {
+            //     id = redirectedDetailStringIdMatch[1];
+            //     return id;
+            // }
+
+            // const urlParams = new URLSearchParams(new URL(redirectedUrl).search);
+            // const templateIdParam = urlParams.get('template_id');
+            // if (templateIdParam) {
+            //     id = templateIdParam;
+            //     return id;
+            // }
+
+            const numericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(?:[a-zA-Z0-9-]+-)?(\d+)/);
+            if (numericIdMatch) {
+                const id = numericIdMatch[1] || numericIdMatch[2];
                 return id;
             }
 
-            const redirectedDetailStringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
-            if (redirectedDetailStringIdMatch && !id) {
-                id = redirectedDetailStringIdMatch[1];
-                return id;
+            // Match: /template-detail/abc-123456789
+            const stringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
+            if (stringIdMatch) {
+                return stringIdMatch[1];
             }
 
-            const urlParams = new URLSearchParams(new URL(redirectedUrl).search);
-            const templateIdParam = urlParams.get('template_id');
-            if (templateIdParam) {
-                id = templateIdParam;
-                return id;
+            // Fallback: look for ?template_id=...
+            const templateId = url.searchParams.get('template_id');
+            if (templateId) {
+                return templateId;
             }
         }
 
@@ -66,11 +84,13 @@ async function getMeta(shortUrl) {
         let templateDataJson = null;
         $('script').each((i, el) => {
             const scriptText = $(el).html();
+            console.log('scriptText:', scriptText);
             if (scriptText.includes('window._ROUTER_DATA')) {
                 templateDataJson = scriptText;
                 return false;
             }
         });
+        console.log('templateDataJson:', templateDataJson);
         const metaJSON = JSON.parse(templateDataJson.replace('window._ROUTER_DATA = ', ''));
 
         if (metaJSON?.loaderData['template-detail_$']?.templateDetail) {
@@ -99,7 +119,7 @@ async function getMeta(shortUrl) {
     }
 }
 
-async function capcutDownloader(capcutUrl, meta= true) {
+async function capcutDownloader(capcutUrl, meta = true) {
     try {
         if (!capcutUrl) {
             return {
@@ -109,7 +129,9 @@ async function capcutDownloader(capcutUrl, meta= true) {
             }
         }
         const templateId = await getTemplateId(capcutUrl)
-        const response = await axios.get(`https://www.capcut.com/templates/${templateId}`, {
+        console.log('Template ID:', templateId);
+
+        const response = await axios.get(`https://www.capcut.com/id-id/templates/${templateId}`, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
             }
@@ -119,6 +141,8 @@ async function capcutDownloader(capcutUrl, meta= true) {
         const $ = cheerio.load(html);
 
         let videoData = null;
+
+        console.log($('script[type="application/ld+json"]').length, 'script found');
 
         $('script[type="application/ld+json"]').each((i, el) => {
             const scriptText = $(el).html();
@@ -132,7 +156,7 @@ async function capcutDownloader(capcutUrl, meta= true) {
 
         if (videoData) {
             if (meta) {
-                videoData = { ...videoData, meta: await getMeta(capcutUrl) };
+                videoData = { ...videoData };
             }
             return {
                 creator: '@ShiroNexo',
@@ -148,6 +172,7 @@ async function capcutDownloader(capcutUrl, meta= true) {
         }
 
     } catch (error) {
+        console.error("Error:", error);
         return {
             creator: '@ShiroNexo',
             status: false,
