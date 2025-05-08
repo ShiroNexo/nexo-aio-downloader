@@ -20,38 +20,15 @@ async function getTemplateId(templateUrl) {
         const redirectedUrl = response.request.res.responseUrl;
 
         if (redirectedUrl) {
-            // const redirectedDetailNumericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(\d+)/);
-            // if (redirectedDetailNumericIdMatch) {
-            //     id = redirectedDetailNumericIdMatch[1];
-            //     return id;
-            // }
-
-            // const redirectedDetailStringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
-            // if (redirectedDetailStringIdMatch && !id) {
-            //     id = redirectedDetailStringIdMatch[1];
-            //     return id;
-            // }
-
-            // const urlParams = new URLSearchParams(new URL(redirectedUrl).search);
-            // const templateIdParam = urlParams.get('template_id');
-            // if (templateIdParam) {
-            //     id = templateIdParam;
-            //     return id;
-            // }
-
             const numericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(?:[a-zA-Z0-9-]+-)?(\d+)/);
             if (numericIdMatch) {
                 const id = numericIdMatch[1] || numericIdMatch[2];
                 return id;
             }
-
-            // Match: /template-detail/abc-123456789
             const stringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
             if (stringIdMatch) {
                 return stringIdMatch[1];
             }
-
-            // Fallback: look for ?template_id=...
             const templateId = url.searchParams.get('template_id');
             if (templateId) {
                 return templateId;
@@ -90,7 +67,6 @@ async function getMeta(shortUrl) {
                 return false;
             }
         });
-        console.log('templateDataJson:', templateDataJson);
         const metaJSON = JSON.parse(templateDataJson.replace('window._ROUTER_DATA = ', ''));
 
         if (metaJSON?.loaderData['template-detail_$']?.templateDetail) {
@@ -129,7 +105,6 @@ async function capcutDownloader(capcutUrl, meta = true) {
             }
         }
         const templateId = await getTemplateId(capcutUrl)
-        console.log('Template ID:', templateId);
 
         const response = await axios.get(`https://www.capcut.com/id-id/templates/${templateId}`, {
             headers: {
@@ -141,8 +116,6 @@ async function capcutDownloader(capcutUrl, meta = true) {
         const $ = cheerio.load(html);
 
         let videoData = null;
-
-        console.log($('script[type="application/ld+json"]').length, 'script found');
 
         $('script[type="application/ld+json"]').each((i, el) => {
             const scriptText = $(el).html();
@@ -156,7 +129,7 @@ async function capcutDownloader(capcutUrl, meta = true) {
 
         if (videoData) {
             if (meta) {
-                videoData = { ...videoData };
+                videoData = { ...videoData, ...await getMeta(capcutUrl) };
             }
             return {
                 creator: '@ShiroNexo',
