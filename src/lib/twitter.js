@@ -152,18 +152,34 @@ function extractMp4s(data) {
     const { core, legacy, views } = data;
     const author = core.user_results.result.legacy.screen_name;
     let description = legacy.full_text.replace(/https:\/\/t\.co\/[a-zA-Z0-9_-]+\s*$/, '').trim();
-
+    // console.log(legacy.entities.media[0].video_info);
     const listUrl = legacy.entities?.media?.map(media => {
         if (media.type === 'video' || media.type === 'animated_gif') {
             const variants = media.video_info?.variants;
+
             if (variants && variants.length > 0) {
-                const bestQualityVariant = variants.reduce((prev, curr) => (curr.bitrate > prev.bitrate ? curr : prev), variants[0]);
-                return { type: media.type === 'video' ? 'video' : 'gif', thumb: media.media_url_https, url: bestQualityVariant.url };
-            } else {
-                return null;
+                // Filter hanya variant yang punya bitrate
+                const mp4Variants = variants.filter(v => v.bitrate !== undefined);
+
+                if (mp4Variants.length > 0) {
+                    // Ambil variant dengan bitrate terbesar
+                    const bestQualityVariant = mp4Variants.reduce((prev, curr) => (
+                        curr.bitrate > prev.bitrate ? curr : prev
+                    ), mp4Variants[0]);
+
+                    return {
+                        type: media.type === 'video' ? 'video' : 'gif',
+                        thumb: media.media_url_https,
+                        url: bestQualityVariant.url
+                    };
+                }
             }
+            return null;
         } else if (media.type === 'photo') {
-            return { type: 'image', url: `${media.media_url_https}?format=png&name=large` };
+            return {
+                type: 'image',
+                url: `${media.media_url_https}?format=png&name=large`
+            };
         }
         return null;
     }).filter(Boolean) || [];
