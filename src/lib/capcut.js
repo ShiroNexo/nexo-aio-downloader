@@ -61,7 +61,6 @@ async function getMeta(shortUrl) {
         let templateDataJson = null;
         $('script').each((i, el) => {
             const scriptText = $(el).html();
-            console.log('scriptText:', scriptText);
             if (scriptText.includes('window._ROUTER_DATA')) {
                 templateDataJson = scriptText;
                 return false;
@@ -129,7 +128,7 @@ async function capcutDownloader(capcutUrl, meta = true) {
 
         if (videoData) {
             if (meta) {
-                videoData = { ...videoData, ...await getMeta(capcutUrl) };
+                videoData = { ...videoData, meta: await getMeta(capcutUrl) };
             }
             return {
                 creator: '@ShiroNexo',
@@ -143,9 +142,7 @@ async function capcutDownloader(capcutUrl, meta = true) {
                 message: 'Data VideoObject not found in LD+JSON'
             }
         }
-
     } catch (error) {
-        console.error("Error:", error);
         return {
             creator: '@ShiroNexo',
             status: false,
