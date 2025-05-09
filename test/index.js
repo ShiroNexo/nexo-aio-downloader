@@ -7,14 +7,14 @@ const listUrl = {
     // tiktok: "https://vt.tiktok.com/ZSYvhPG55/",
     // "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
     // sfile: "https://sfile.mobi/5g9STNCU525",
-    bilibili: "https://www.bilibili.tv/id/video/4794971188762624?bstar_from=bstar-web.homepage.trending.all"
+    // bilibili: "https://www.bilibili.tv/id/video/4794971188762624?bstar_from=bstar-web.homepage.trending.all"
 }
 
 async function AIOTest() {
     Object.keys(listUrl).forEach(async (key) => {
         await nexo.aio(listUrl[key]).then((res) => {
             console.log(`\nTest ${res.status ? 'passed 🟢' : 'failed 🔴'} for ${key}:`);
-            console.log(res);
+            console.log(res.data);
         }).catch((err) => {
             console.log(err)
             console.log(`Test failed 🔴 for ${key}:\n${JSON.stringify(err, null, 2)}\n`);
@@ -82,9 +82,20 @@ async function tiktokTest() {
         })
 }
 
-AIOTest()
+async function capcutTest() {
+    nexo.capcut('https://www.capcut.com/id-id/templates/vibesaesthetic-7411160567722806584?scene=category&template_scale=9%3A16&enter_from=first_page')
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
+// AIOTest()
 //youtubeTest()
 //youtubeShortTest()
 //biliTest()
-//twitterTest()
+// twitterTest()
 //tiktokTest()
+capcutTest()

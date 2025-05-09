@@ -20,23 +20,18 @@ async function getTemplateId(templateUrl) {
         const redirectedUrl = response.request.res.responseUrl;
 
         if (redirectedUrl) {
-            const redirectedDetailNumericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(\d+)/);
-            if (redirectedDetailNumericIdMatch) {
-                id = redirectedDetailNumericIdMatch[1];
+            const numericIdMatch = redirectedUrl.match(/\/template-detail\/(?:[a-zA-Z0-9-]+)?\/(\d+)|\/templates\/(?:[a-zA-Z0-9-]+-)?(\d+)/);
+            if (numericIdMatch) {
+                const id = numericIdMatch[1] || numericIdMatch[2];
                 return id;
             }
-
-            const redirectedDetailStringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
-            if (redirectedDetailStringIdMatch && !id) {
-                id = redirectedDetailStringIdMatch[1];
-                return id;
+            const stringIdMatch = redirectedUrl.match(/\/template-detail\/([a-zA-Z0-9-]+)/);
+            if (stringIdMatch) {
+                return stringIdMatch[1];
             }
-
-            const urlParams = new URLSearchParams(new URL(redirectedUrl).search);
-            const templateIdParam = urlParams.get('template_id');
-            if (templateIdParam) {
-                id = templateIdParam;
-                return id;
+            const templateId = url.searchParams.get('template_id');
+            if (templateId) {
+                return templateId;
             }
         }
 
@@ -99,7 +94,7 @@ async function getMeta(shortUrl) {
     }
 }
 
-async function capcutDownloader(capcutUrl, meta= true) {
+async function capcutDownloader(capcutUrl, meta = true) {
     try {
         if (!capcutUrl) {
             return {
@@ -109,7 +104,8 @@ async function capcutDownloader(capcutUrl, meta= true) {
             }
         }
         const templateId = await getTemplateId(capcutUrl)
-        const response = await axios.get(`https://www.capcut.com/templates/${templateId}`, {
+
+        const response = await axios.get(`https://www.capcut.com/id-id/templates/${templateId}`, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
             }
@@ -146,7 +142,6 @@ async function capcutDownloader(capcutUrl, meta= true) {
                 message: 'Data VideoObject not found in LD+JSON'
             }
         }
-
     } catch (error) {
         return {
             creator: '@ShiroNexo',
