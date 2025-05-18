@@ -8,7 +8,7 @@ const os = require('os');
 
 const tempDir = os.tmpdir();
 
-async function bilibiliDownloader(url, quality = '480P') {
+async function bilibiliDownloader(url, { download = false, quality = '32', cookie = '' }) {
     try {
         let aid = /\/video\/(\d+)/.exec(url)[1];
 
@@ -24,6 +24,9 @@ async function bilibiliDownloader(url, quality = '480P') {
         const views = $('.bstar-meta__tips-left .bstar-meta-text').first().text();
 
         const response = await axios.get('https://api.bilibili.tv/intl/gateway/web/playurl', {
+            headers: {
+                cookie: cookie.startsWith('SESSDATA=') ? cookie : `SESSDATA=${cookie}`,
+            },
             params: {
                 's_locale': 'id_ID',
                 'platform': 'web',
@@ -44,6 +47,7 @@ async function bilibiliDownloader(url, quality = '480P') {
         const videoList = response.data.playurl.video.map(item => {
             return {
                 quality: item.stream_info.desc_words,
+                quality_id: item.video_resource.quality,
                 codecs: item.video_resource.codecs,
                 size: item.video_resource.size,
                 mime: item.video_resource.mime_type,
@@ -57,17 +61,21 @@ async function bilibiliDownloader(url, quality = '480P') {
                 url: item.url || item.backup_url[0]
             }
         })
-        const v = videoList.filter(v => v.quality == quality)[0];
-        if (!v) {
-            throw new Error('No video found');
+
+        let buffer = null;
+        if (download) {
+            const v = videoList.filter(v => v.quality_id == quality)[0];
+            if (!v) {
+                throw new Error('No video found for the specified quality.');
+            }
+
+            const [videoBuffer, audioBuffer] = await Promise.all([
+                getBuffer(url, v.url),
+                getBuffer(url, audioList[0].url)
+            ]);
+
+            buffer = await mergeAudioVideo(audioBuffer, videoBuffer);
         }
-
-        const [videoBuffer, audioBuffer] = await Promise.all([
-            getVideo(url, v.url),
-            getVideo(url, audioList[0].url)
-        ]);
-
-        const buffer = await mergeAudioVideo(audioBuffer, videoBuffer);
 
         return {
             creator: '@ShiroNexo',
@@ -147,7 +155,7 @@ function mergeAudioVideo(audioBuffer, videoBuffer) {
     });
 }
 
-async function getVideo(refer, url) {
+async function getBuffer(refer, url) {
     const headers = {
         'Accept': '*/*',
         'Accept-Encoding': 'identity',
@@ -200,7 +208,7 @@ async function getVideo(refer, url) {
         }
 
         const finalBuffer = Buffer.concat(buffers);
-        console.log('Media has been downloaded to buffer');
+        console.log('Media successfully downloaded!');
         return finalBuffer;
     } catch (error) {
         throw error;
