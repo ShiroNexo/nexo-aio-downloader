@@ -57,7 +57,7 @@ const allInOne = async (url, { proxy = null, cookie = null} = {}) => {
             case 'mega':
                 return await megaDownloader(url);
             case 'bilibili':
-                return await bilibiliDownloader(url);
+                return await bilibiliDownloader(url, { download: true });
             case 'capcut':
                 return await capcutDownloader(url);
             case 'pinterest':

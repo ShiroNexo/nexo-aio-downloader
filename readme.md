@@ -241,18 +241,56 @@ const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example
 
 ```js
 const nexo = require("nexo-aio-downloader");
+const fs = require("fs")
 
 // Example Url
-const biliUrl = 'https://www.bilibili.tv/id/video/4791529255207424?bstar_from=bstar-web.homepage.recommend.all'
+const biliUrl = 'https://www.bilibili.tv/id/video/2042507617'
 
-// 144P || 240P || 360P || 480P || 720P
-const quality = '480P' // Default 480P
+/**
+ * Video Quality Mapping (Bilibili)
+ * 
+ * ID   Resolution   Notes
+ *  6   => 240p       - Low quality
+ * 16   => 360p       - SD
+ * 32   => 480p       - SD+ (Default)
+ * 64   => 720p       - HD
+ * 
+ * ⚠️ Requires login (cookie) for qualities below:
+ * 80   => 1080p      - Full HD
+ * 112  => 1080p+     - Higher bitrate
+ * 116  => 4K         - UHD
+ * 120  => 8K         - Ultra HD
+ */
+
+const quality = '32'; // Default: 480p
+
+// Optional (for high quality/VIP video)
+const cookie = 'SESSDATA=xxxxx'
 
 (async () => {
-    // Download Custom Quality Bilibili
-    const bili = await nexo.bilibili(biliUrl, quality)
-    console.log(bili)
-})()
+    const result = await bilibiliDownloader(biliUrl, {
+        download: true, // true for download video + audio, false for metadata only
+        quality,
+        cookie, 
+    });
+
+    if (result.status) {
+        console.log('Title:', result.data.title);
+        console.log('Available quality:');
+        result.data.mediaList.videoList.forEach(v => {
+            console.log(`- ${v.quality} (${v.quality_id})`);
+        });
+
+        if (result.data.result) {
+            fs.writeFileSync(`${result.data.title}.mp4`, result.data.result);
+            console.log('✅ Video saved succesfully!');
+        } else {
+            console.log('📄 Mode metadata-only, no downloading video.');
+        }
+    } else {
+        console.error('❌ Gagal:', result.message);
+    }
+})();
 ```
 
 ## PINTEREST Example

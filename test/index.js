@@ -1,13 +1,14 @@
 const nexo = require('../src/index');
+const fs = require('fs');
 
 const listUrl = {
-    twitter: " https://x.com/i/status/1911076115873185971",
+    //twitter: " https://x.com/i/status/1911076115873185971",
     // instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
     // facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
     // tiktok: "https://vt.tiktok.com/ZSYvhPG55/",
     // "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
     // sfile: "https://sfile.mobi/5g9STNCU525",
-    // bilibili: "https://www.bilibili.tv/id/video/4794971188762624?bstar_from=bstar-web.homepage.trending.all"
+    bilibili: "https://www.bilibili.tv/id/video/2042507617"
 }
 
 async function AIOTest() {
@@ -53,9 +54,14 @@ async function pixivTest() {
 }
 
 async function biliTest() {
-    nexo.bilibili(listUrl.bilibili)
+    nexo.bilibili(listUrl.bilibili, {
+            download: true,
+            quality: '32',
+            cookie: 'SESSDATA='
+        })
         .then((res) => {
-            console.log(res);
+            console.log(res.data.mediaList.videoList);
+            fs.writeFileSync('test.mp4', res.data.result);
         })
         .catch((err) => {
             console.log(err);
@@ -95,7 +101,7 @@ async function capcutTest() {
 // AIOTest()
 //youtubeTest()
 //youtubeShortTest()
-//biliTest()
+biliTest()
 // twitterTest()
 //tiktokTest()
-capcutTest()
+//capcutTest()
