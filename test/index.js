@@ -83,7 +83,7 @@ async function tiktokTest() {
 }
 
 async function capcutTest() {
-    nexo.capcut('https://www.capcut.com/id-id/templates/vibesaesthetic-7411160567722806584?scene=category&template_scale=9%3A16&enter_from=first_page')
+    nexo.capcut('https://www.capcut.com/id-id/templates/vibesaesthetic-7411160567722806584?scene=category&template_scale=9%3A16&enter_from=first_page', false)
         .then((res) => {
             console.log(res);
         })
