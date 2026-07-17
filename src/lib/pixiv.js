@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const unzipper = require('unzipper');
 const os = require('os');
-const GIFEncoder = require('gifencoder');
+const {GifEncoder} = require('@skyra/gifenc');
 const sharp = require('sharp');
 const { PassThrough } = require('stream');
 
@@ -105,7 +105,7 @@ async function createGIF(imageDir, frames) {
     const firstImagePath = path.join(imageDir, frames[0].file);
     const { width, height } = await sharp(firstImagePath).metadata();
 
-    const encoder = new GIFEncoder(width, height);
+    const encoder = new GifEncoder(width, height);
     const stream = new PassThrough();
     const chunks = [];
     encoder.createReadStream().pipe(stream);
@@ -179,6 +179,7 @@ async function pixivDownloader(input, cookie) {
     try {
         const response = await axios.get(url, { headers: getMetaHeaders(cookie) });
         const preloadDataMatch = response.data.match(/<meta name="preload-data" id="meta-preload-data" content='(.+?)'/);
+        // console.log(response.data);
         if (!preloadDataMatch) {
             console.log('Preload data not found in response.');
             return { status: false };

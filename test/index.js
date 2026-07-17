@@ -55,10 +55,10 @@ async function pixivTest() {
 
 async function biliTest() {
     nexo.bilibili(listUrl.bilibili, {
-            download: true,
-            quality: '32',
-            cookie: 'SESSDATA='
-        })
+        download: true,
+        quality: '32',
+        cookie: 'SESSDATA='
+    })
         .then((res) => {
             console.log(res.data.mediaList.videoList);
             fs.writeFileSync('test.mp4', res.data.result);
@@ -98,10 +98,21 @@ async function capcutTest() {
         })
 }
 
+async function pxivTest() {
+    nexo.pixiv('https://www.pixiv.net/en/artworks/120829610')
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
 // AIOTest()
 //youtubeTest()
 //youtubeShortTest()
-biliTest()
+// biliTest()
 // twitterTest()
 //tiktokTest()
 //capcutTest()
+pxivTest()
