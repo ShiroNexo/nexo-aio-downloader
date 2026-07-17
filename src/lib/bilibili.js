@@ -1,21 +1,24 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
-const { join } = require('path');
-const { spawn } = require('child_process');
-const ffmpegPath = require('ffmpeg-static');
+const path = require('path');
 const os = require('os');
+const { spawn } = require('child_process');
+const ffmpegStatic = require('ffmpeg-static');
+const { successResponse, errorResponse } = require('./utils');
 
+const ffmpegPath = fs.existsSync(ffmpegStatic) ? ffmpegStatic : 'ffmpeg';
 const tempDir = os.tmpdir();
 
-async function bilibiliDownloader(url, { download = false, quality = '32', cookie = '' }) {
+async function bilibiliDownloader(url, { download = false, quality = '32', cookie = '' } = {}) {
     try {
-        let aid = /\/video\/(\d+)/.exec(url)[1];
+        const aid = /\/video\/(\d+)/.exec(url)?.[1];
+        if (!aid) return errorResponse('Invalid Bilibili URL');
 
-        const appInfo = await axios.get(url).then(res => res.data)
-
+        const appInfo = await axios.get(url).then(res => res.data);
         const $ = cheerio.load(appInfo);
-        const title = $('meta[property="og:title"]').attr('content').split('|')[0].trim();
+
+        const title = $('meta[property="og:title"]').attr('content')?.split('|')[0]?.trim() || '';
         const locate = $('meta[property="og:locale"]').attr('content');
         const description = $('meta[property="og:description"]').attr('content');
         const type = $('meta[property="og:video:type"]').attr('content');
@@ -24,123 +27,89 @@ async function bilibiliDownloader(url, { download = false, quality = '32', cooki
         const views = $('.bstar-meta__tips-left .bstar-meta-text').first().text();
 
         const response = await axios.get('https://api.bilibili.tv/intl/gateway/web/playurl', {
-            headers: {
-                cookie: cookie.startsWith('SESSDATA=') ? cookie : `SESSDATA=${cookie}`,
-            },
+            headers: { cookie: cookie.startsWith('SESSDATA=') ? cookie : `SESSDATA=${cookie}` },
             params: {
-                's_locale': 'id_ID',
-                'platform': 'web',
-                'aid': aid,
-                'qn': '64',
-                'type': '0',
-                'device': 'wap',
-                'tf': '0',
-                'spm_id': 'bstar-web.ugc-video-detail.0.0',
-                'from_spm_id': 'bstar-web.homepage.trending.all',
-                'fnval': '16',
-                'fnver': '0',
-                'fnver': '0',
-                'fnval': '16',
-            }
-        }).then(res => res.data)
+                s_locale: 'id_ID',
+                platform: 'web',
+                aid,
+                qn: '64',
+                type: '0',
+                device: 'wap',
+                tf: '0',
+                spm_id: 'bstar-web.ugc-video-detail.0.0',
+                from_spm_id: 'bstar-web.homepage.trending.all',
+                fnval: '16',
+                fnver: '0',
+            },
+        }).then(res => res.data);
 
-        const videoList = response.data.playurl.video.map(item => {
-            return {
-                quality: item.stream_info.desc_words,
-                quality_id: item.video_resource.quality,
-                codecs: item.video_resource.codecs,
-                size: item.video_resource.size,
-                mime: item.video_resource.mime_type,
-                url: item.video_resource?.url || item.video_resource?.backup_url?.[0]
-            }
-        })
+        const videoList = response.data.playurl.video.map(item => ({
+            quality: item.stream_info.desc_words,
+            quality_id: item.video_resource.quality,
+            codecs: item.video_resource.codecs,
+            size: item.video_resource.size,
+            mime: item.video_resource.mime_type,
+            url: item.video_resource?.url || item.video_resource?.backup_url?.[0],
+        }));
 
-        const audioList = response.data.playurl.audio_resource.map(item => {
-            return {
-                size: item.size,
-                url: item.url || item.backup_url[0]
-            }
-        })
+        const audioList = response.data.playurl.audio_resource.map(item => ({
+            size: item.size,
+            url: item.url || item.backup_url[0],
+        }));
 
         let buffer = null;
         if (download) {
-            const v = videoList.filter(v => v.quality_id == quality)[0];
-            if (!v) {
-                throw new Error('No video found for the specified quality.');
-            }
+            const v = videoList.find(v => v.quality_id == quality);
+            if (!v) throw new Error('No video found for the specified quality.');
 
             const [videoBuffer, audioBuffer] = await Promise.all([
                 getBuffer(url, v.url),
-                getBuffer(url, audioList[0].url)
+                getBuffer(url, audioList[0].url),
             ]);
 
             buffer = await mergeAudioVideo(audioBuffer, videoBuffer);
         }
 
-        return {
-            creator: '@ShiroNexo',
-            status: true,
-            data: {
-                title,
-                locate,
-                description,
-                type,
-                cover,
-                views,
-                like,
-                result: buffer,
-                mediaList: {
-                    videoList,
-                    audioList,
-                }
-            }
-        }
+        return successResponse({
+            title,
+            locate,
+            description,
+            type,
+            cover,
+            views,
+            like,
+            result: buffer,
+            mediaList: { videoList, audioList },
+        });
     } catch (error) {
-        console.error('Bilibili Error: ', error);
-        return {
-            creator: '@ShiroNexo',
-            status: false,
-            message: error.message || 'Something went wrong'
-        }
+        console.error('Bilibili Error:', error);
+        return errorResponse(error.message || 'Something went wrong');
     }
 }
 
 function mergeAudioVideo(audioBuffer, videoBuffer) {
     return new Promise((resolve, reject) => {
-        const audioPath = join(tempDir, `${Date.now()}-audio.mp3`);
-        const videoPath = join(tempDir, `${Date.now()}-video.mp4`);
-        const outputPath = join(tempDir, `${Date.now()}-output.mp4`);
+        const audioPath = path.join(tempDir, `${Date.now()}-audio.mp3`);
+        const videoPath = path.join(tempDir, `${Date.now()}-video.mp4`);
+        const outputPath = path.join(tempDir, `${Date.now()}-output.mp4`);
 
         fs.writeFileSync(audioPath, audioBuffer);
         fs.writeFileSync(videoPath, videoBuffer);
 
-        const args = [
-            '-i', videoPath,
-            '-i', audioPath,
-            '-c:v', 'copy',
-            '-c:a', 'aac',
-            '-strict', 'experimental',
-            '-y',
-            outputPath
-        ];
+        const ffmpeg = spawn(ffmpegPath, [
+            '-i', videoPath, '-i', audioPath,
+            '-c:v', 'copy', '-c:a', 'aac',
+            '-strict', 'experimental', '-y', outputPath,
+        ]);
 
-        const ffmpeg = spawn(ffmpegPath, args);
-
-        ffmpeg.on('error', (err) => {
-            cleanup();
-            reject(err);
-        });
-
-        ffmpeg.on('close', (code) => {
+        ffmpeg.on('error', err => { cleanup(); reject(err); });
+        ffmpeg.on('close', code => {
             if (code === 0) {
                 try {
                     const outputBuffer = fs.readFileSync(outputPath);
                     cleanup();
                     resolve(outputBuffer);
-                } catch (err) {
-                    cleanup();
-                    reject(err);
-                }
+                } catch (err) { cleanup(); reject(err); }
             } else {
                 cleanup();
                 reject(new Error(`ffmpeg exited with code ${code}`));
@@ -148,8 +117,8 @@ function mergeAudioVideo(audioBuffer, videoBuffer) {
         });
 
         function cleanup() {
-            [audioPath, videoPath, outputPath].forEach(path => {
-                if (fs.existsSync(path)) fs.unlinkSync(path);
+            [audioPath, videoPath, outputPath].forEach(p => {
+                if (fs.existsSync(p)) fs.unlinkSync(p);
             });
         }
     });
@@ -157,62 +126,49 @@ function mergeAudioVideo(audioBuffer, videoBuffer) {
 
 async function getBuffer(refer, url) {
     const headers = {
-        'Accept': '*/*',
+        Accept: '*/*',
         'Accept-Encoding': 'identity',
         'Accept-Language': 'en-US,en;q=0.9',
         'Cache-Control': 'no-cache',
-        'Dnt': '1',
-        'Origin': 'https://www.bilibili.tv',
-        'Pragma': 'no-cache',
-        'Priority': 'u=1, i',
-        'Referer': refer,
+        Dnt: '1',
+        Origin: 'https://www.bilibili.tv',
+        Pragma: 'no-cache',
+        Priority: 'u=1, i',
+        Referer: refer,
         'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Microsoft Edge";v="126"',
         'Sec-Ch-Ua-Mobile': '?0',
         'Sec-Ch-Ua-Platform': 'Windows',
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'cross-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
     };
 
-    try {
-        let buffers = [];
-        let start = 0;
-        let end = 5 * 1024 * 1024; // 5MB chunks
-        let fileSize = 0;
+    let buffers = [];
+    let start = 0;
+    let end = 5 * 1024 * 1024;
+    let fileSize = 0;
 
-        while (true) {
-            const range = `bytes=${start}-${end}`;
+    while (true) {
+        const response = await axios.get(url, {
+            headers: { ...headers, Range: `bytes=${start}-${end}` },
+            responseType: 'arraybuffer',
+        });
 
-            const response = await axios.get(url, {
-                headers: { ...headers, Range: range },
-                responseType: 'arraybuffer'
-            });
-
-            if (fileSize === 0) {
-                const contentRange = response.headers['content-range'];
-                if (contentRange) {
-                    fileSize = parseInt(contentRange.split('/')[1]);
-                    console.log(`Total file size: ${fileSize} bytes`);
-                }
-            }
-
-            buffers.push(Buffer.from(response.data));
-
-            if (end >= fileSize - 1) {
-                break;
-            }
-
-            start = end + 1;
-            end = Math.min(start + 5 * 1024 * 1024 - 1, fileSize - 1);
+        if (fileSize === 0) {
+            const contentRange = response.headers['content-range'];
+            if (contentRange) fileSize = parseInt(contentRange.split('/')[1]);
         }
 
-        const finalBuffer = Buffer.concat(buffers);
-        console.log('Media successfully downloaded!');
-        return finalBuffer;
-    } catch (error) {
-        throw error;
+        buffers.push(Buffer.from(response.data));
+
+        if (end >= fileSize - 1) break;
+
+        start = end + 1;
+        end = Math.min(start + 5 * 1024 * 1024 - 1, fileSize - 1);
     }
+
+    return Buffer.concat(buffers);
 }
 
-module.exports = bilibiliDownloader
+module.exports = bilibiliDownloader;

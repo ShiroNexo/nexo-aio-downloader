@@ -1,54 +1,32 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { successResponse, errorResponse } = require('./utils');
 
 async function snackDownloader(url) {
     try {
         const response = await axios.get(url, { maxRedirects: 0 });
-        if (response.status !== 200) {
-            return {
-                creator: '@ShiroNexo',
-                status: false,
-                message: "Failed to get data from URL"
-            }
-        }
+        if (response.status !== 200) return errorResponse('Failed to get data from URL');
 
-        const html = response.data;
-        const $ = cheerio.load(html);
-
+        const $ = cheerio.load(response.data);
         const scriptElement = $('#VideoObject');
-        if (scriptElement.length === 0) {
-            return {
-                creator: '@ShiroNexo',
-                status: false,
-                message: "Elemen <script> with ID 'VideoObject' not found"
-            }
-        }
+        if (scriptElement.length === 0) return errorResponse("Element <script> with ID 'VideoObject' not found");
 
-        const scriptContent = scriptElement.html();
-        const videoData = JSON.parse(scriptContent);
+        const videoData = JSON.parse(scriptElement.html());
 
-        return {
-            creator: '@ShiroNexo',
-            status: true,
-            data: {
-                author: videoData.creator.mainEntity.name,
-                description: videoData.description,
-                transcript: videoData.transcript,
-                thumbnailUrl: videoData.thumbnailUrl,
-                uploadDate: videoData.uploadDate,
-                comment: videoData.commentCount,
-                audio: videoData.audio,
-                result: videoData.contentUrl
-            }
-        }
+        return successResponse({
+            author: videoData.creator.mainEntity.name,
+            description: videoData.description,
+            transcript: videoData.transcript,
+            thumbnailUrl: videoData.thumbnailUrl,
+            uploadDate: videoData.uploadDate,
+            comment: videoData.commentCount,
+            audio: videoData.audio,
+            result: videoData.contentUrl,
+        });
     } catch (error) {
         console.error(error);
-        return {
-            creator: '@ShiroNexo',
-            status: false,
-            message: error.message || 'Unknown error'
-        }
+        return errorResponse(error.message || 'Unknown error');
     }
 }
 
-module.exports = snackDownloader
+module.exports = snackDownloader;

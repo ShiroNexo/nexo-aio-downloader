@@ -6,6 +6,7 @@ const os = require('os');
 const {GifEncoder} = require('@skyra/gifenc');
 const sharp = require('sharp');
 const { PassThrough } = require('stream');
+const { successResponse, errorResponse } = require('./utils');
 
 const tempDir = os.tmpdir();
 
@@ -13,83 +14,44 @@ const defaultHeaders = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, seperti Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
     'Accept-Language': 'en-US,en;q=0.9',
     'Cache-Control': 'no-cache',
-    'DNT': '1'
+    DNT: '1',
 };
 
 function getDownloadHeaders() {
-    return {
-        ...defaultHeaders,
-        'Accept': '*/*',
-        'Referer': 'https://www.pixiv.net/',
-        'Origin': 'https://www.pixiv.net'
-    };
+    return { ...defaultHeaders, Accept: '*/*', Referer: 'https://www.pixiv.net/', Origin: 'https://www.pixiv.net' };
 }
 
-function getMetadataHeaders(id, cookie) {
-    return {
-        ...defaultHeaders,
-        'Accept': 'application/json',
-        'Cookie': `PHPSESSID=${cookie}`,
-        'Referer': `https://www.pixiv.net/en/artworks/${id}`
-    };
+function getMetadataHeaders(cookie) {
+    return { ...defaultHeaders, Cookie: `PHPSESSID=${cookie}` };
 }
 
 function getImageHeaders() {
-    return {
-        ...defaultHeaders,
-        'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-        'Referer': 'https://www.pixiv.net/'
-    };
-}
-
-function getMetaHeaders(cookie) {
-    return {
-        ...defaultHeaders,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Cookie': `PHPSESSID=${cookie}`,
-        'Referer': 'https://www.pixiv.net/'
-    };
+    return { ...defaultHeaders, Accept: 'image/webp,image/apng,image/*,*/*;q=0.8', Referer: 'https://www.pixiv.net/' };
 }
 
 async function downloadFile(url, destination) {
     const writer = fs.createWriteStream(destination);
-    try {
-        const response = await axios.get(url, {
-            responseType: 'stream',
-            headers: getDownloadHeaders()
-        });
-        response.data.pipe(writer);
-        return new Promise((resolve, reject) => {
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
-    } catch (error) {
-        throw new Error(`Failed to download file: ${error.message}`);
-    }
+    const response = await axios.get(url, { responseType: 'stream', headers: getDownloadHeaders() });
+    response.data.pipe(writer);
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
 }
 
 async function extractZip(zipPath, extractToPath) {
-    return fs.createReadStream(zipPath)
-        .pipe(unzipper.Extract({ path: extractToPath }))
-        .promise();
+    return fs.createReadStream(zipPath).pipe(unzipper.Extract({ path: extractToPath })).promise();
 }
 
 async function getMetadata(id, cookie) {
     const url = `https://www.pixiv.net/ajax/illust/${id}/ugoira_meta?lang=en`;
-    try {
-        const response = await axios.get(url, { headers: getMetadataHeaders(id, cookie) });
-        return response.data;
-    } catch (error) {
-        if (error.response && error.response.status === 404) {
-            throw new Error(`R-18 works cannot be displayed. Cookie required to download R-18 works.`);
-        }
-        throw new Error(`Error fetching metadata`);
-    }
+    const response = await axios.get(url, { headers: getMetadataHeaders(cookie) });
+    return response.data;
 }
 
 function parseArtworkId(url) {
     const id = url.split('/').pop();
-    if (!/^\d+$/.test(id)) throw new Error("Invalid Pixiv Url");
+    if (!/^\d+$/.test(id)) throw new Error('Invalid Pixiv Url');
     return id;
 }
 
@@ -127,16 +89,11 @@ async function createGIF(imageDir, frames) {
                 for (const frame of frames) {
                     encoder.setDelay(frame.delay);
                     const imagePath = path.join(imageDir, frame.file);
-                    const { data } = await sharp(imagePath)
-                        .ensureAlpha()
-                        .raw()
-                        .toBuffer({ resolveWithObject: true });
+                    const { data } = await sharp(imagePath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
                     encoder.addFrame(data);
                 }
                 encoder.finish();
-            } catch (err) {
-                reject(err);
-            }
+            } catch (err) { reject(err); }
         })();
     });
 }
@@ -164,13 +121,8 @@ async function pixivVideoDownloader(url, cookie) {
 }
 
 async function pixivImageDownloader(url) {
-    try {
-        console.log(`Downloading image from ${url}`);
-        const response = await axios.get(url, { responseType: 'arraybuffer', headers: getImageHeaders() });
-        return response.data;
-    } catch (error) {
-        throw new Error(`Failed to download image: ${error.message}`);
-    }
+    const response = await axios.get(url, { responseType: 'arraybuffer', headers: getImageHeaders() });
+    return response.data;
 }
 
 async function pixivDownloader(input, cookie) {
@@ -179,30 +131,28 @@ async function pixivDownloader(input, cookie) {
     try {
         const response = await axios.get(url, { headers: getMetaHeaders(cookie) });
         const preloadDataMatch = response.data.match(/<meta name="preload-data" id="meta-preload-data" content='(.+?)'/);
-        // console.log(response.data);
         if (!preloadDataMatch) {
             console.log('Preload data not found in response.');
             return { status: false };
         }
 
-        const preloadDataObject = JSON.parse(preloadDataMatch[1]);
-        const preData = preloadDataObject['illust'][id];
+        const preData = response.data.body;
         const { urls, pageCount, tags, illustType } = preData;
 
-        const processedTags = tags['tags']
+        const processedTags = tags.tags
             .map(tag => {
-                const tagName = tag['tag'].toLowerCase();
+                const tagName = tag.tag.toLowerCase();
                 return tagName + (tag.translation?.en ? ` (${tag.translation.en})` : '');
             })
             .join(', ');
 
         let data = [];
         if (illustType === 2) {
-            const result = await pixivVideoDownloader(url, cookie);
+            const result = await pixivVideoDownloader(input, cookie);
             data.push(result);
         } else {
             if (!urls.original) {
-                return { status: false, message: 'R-18 works cannot be displayed. Cookie needed to view R-18 works.' };
+                return errorResponse('R-18 works cannot be displayed. Cookie needed to view R-18 works.');
             }
             for (let i = 0; i < pageCount; i++) {
                 const pageUrl = Object.fromEntries(
@@ -213,56 +163,44 @@ async function pixivDownloader(input, cookie) {
             }
         }
 
-        return {
-            creator: '@ShiroNexo',
-            status: true,
-            data: {
-                title: preData['title'],
-                alt: preData['alt'],
-                user: preData['userName'],
-                desc: preData['description'],
-                like: preData['likeCount'],
-                view: preData['viewCount'],
-                comment: preData['commentCount'],
-                tags: processedTags,
-                result: data
-            }
-        };
+        return successResponse({
+            title: preData.title,
+            alt: preData.alt,
+            user: preData.userName,
+            desc: preData.description,
+            like: preData.likeCount,
+            view: preData.viewCount,
+            comment: preData.commentCount,
+            tags: processedTags,
+            result: data,
+        });
     } catch (error) {
-        console.error("Pixiv Downloader: " + error);
-        return {
-            creator: '@ShiroNexo',
-            status: false,
-            message: error.message || 'Unknown error'
-        };
+        console.error('Pixiv Downloader:', error);
+        return errorResponse(error.message || 'Unknown error');
     }
 }
 
-async function pixivBacthDownloader(url, cookie, type = 'illusts') {
+async function pixivBatchDownloader(url, cookie, type = 'illusts') {
     try {
         const id = parseUserId(url);
         const data = await axios.get(`https://www.pixiv.net/ajax/user/${id}/profile/all?lang=en`, {
-            headers: getMetadataHeaders(id, cookie)
+            headers: getMetadataHeaders(cookie),
         }).then(res => res.data);
 
+        if (!data || !data.body || !data.body[type]) {
+            return errorResponse(data?.message || 'Failed to fetch user profile (requires login cookie)');
+        }
         const listArtId = Object.keys(data.body[type]);
         let result = [];
-        for (let artId of listArtId) {
+        for (const artId of listArtId) {
             const item = await pixivDownloader(artId, cookie);
             result.push(item.data);
         }
-        return {
-            creator: '@ShiroNexo',
-            status: true,
-            data: result
-        };
+
+        return successResponse(result);
     } catch (error) {
-        console.error("Pixiv Batch: " + error);
-        return {
-            creator: '@ShiroNexo',
-            status: false,
-            message: error.message || 'Unknown error'
-        };
+        console.error('Pixiv Batch:', error);
+        return errorResponse(error.message || 'Unknown error');
     }
 }
 
@@ -270,8 +208,7 @@ async function cleanup(destination, unzipPath) {
     try {
         fs.unlinkSync(destination);
         fs.rmSync(unzipPath, { recursive: true, force: true });
-    } catch (error) {
-    }
+    } catch {}
 }
 
-module.exports = { pixivDownloader, pixivBacthDownloader };
+module.exports = { pixivDownloader, pixivBatchDownloader };

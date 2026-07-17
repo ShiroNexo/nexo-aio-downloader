@@ -1,347 +1,345 @@
-# All In One Downloader
+# Nexo AIO Downloader
 
-Download Media From Multiple Website Using One Library.
+[![version](https://img.shields.io/npm/v/nexo-aio-downloader)](https://www.npmjs.com/package/nexo-aio-downloader)
+[![license](https://img.shields.io/npm/l/nexo-aio-downloader)](https://github.com/ShiroNexo/nexo-aio-downloader/blob/main/LICENSE)
 
-All downloader scrape directly from the sites without 3rd api.
+**One library. All platforms.** Download video, audio, and images from 13 platforms using a unified API — all scraped directly from the source, no third‑party APIs.
 
-# Available Sites
-Still Adding New More...
+---
 
-<table>
-  <tr>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/instagram/FF0000"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Instagram</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/facebook/1877F2"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Facebook</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/tiktok/000000"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Tiktok</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/x/1DA1F2"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Twitter</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/youtube/FF0000"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Youtube</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/googledrive/4285F4"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>GoogleDrive</b>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="40px">
-      <img src="https://logos-world.net/wp-content/uploads/2024/01/CapCut-Symbol.png"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Capcut</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/pixiv/2A95FF"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Pixiv</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/mega/F00000"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Mega</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://1.bp.blogspot.com/-PuWtJg49s_0/YCPIGwfvu6I/AAAAAAAAD40/qSgEwMEWRB0u8yxozbojxWGChflTDrX8ACLcBGAsYHQ/s1600/Logo%2BSnack%2BVideo.png"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Snack</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/pinterest/E60023"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Pinterest</b>
-    </td>
-    <td align="center" width="40px">
-      <img src="https://cdn.simpleicons.org/bilibili/00A1D6"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Bilibili</b>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="40px">
-      <img src="https://sfile.mobi/icon/sfile-icon-192x192.png"
-           style="width: 30px; height: 30px; object-fit: contain; display: block;" /><br>
-      <b>Sfile</b>
-    </td>
-  </tr>
-</table>
+## Supported Sites
 
+| | | | | | |
+|---|---|---|---|---|---|
+| <img width="20" src="https://cdn.simpleicons.org/instagram/FF0000" /> **Instagram** | <img width="20" src="https://cdn.simpleicons.org/facebook/1877F2" /> **Facebook** | <img width="20" src="https://cdn.simpleicons.org/tiktok/000000" /> **TikTok** | <img width="20" src="https://cdn.simpleicons.org/twitter/1DA1F2" /> **Twitter/X** | <img width="20" src="https://cdn.simpleicons.org/youtube/FF0000" /> **YouTube** | <img width="20" src="https://cdn.simpleicons.org/googledrive/4285F4" /> **Google Drive** |
+| <img width="20" src="https://cdn.simpleicons.org/pixiv/2A95FF" /> **Pixiv** | <img width="20" src="https://cdn.simpleicons.org/bilibili/00A1D6" /> **Bilibili** | <img width="20" src="https://cdn.simpleicons.org/pinterest/E60023" /> **Pinterest** | <img width="20" src="https://cdn.simpleicons.org/mega/F00000" /> **Mega** | **Sfile** | **Snack** |
+| **CapCut** | | | | | |
 
+> **YouTube** needs Python 3.7+ with `yt-dlp` in PATH. If missing, the YouTube downloader auto‑disables.
 
+---
 
-# Required (OPTIONAL)
-> Youtube requires Python 3.7 or above available in your system as python3. Otherwise, the youtube downloader get disable.
-
-
-# Usage
-
-### Installation:
+## Installation
 
 ```bash
 npm i nexo-aio-downloader
 ```
 
+---
 
-## Example
-For more example will added in future.
+## Quick Start
 
 ```js
-const nexo = require("nexo-aio-downloader");
+const nexo = require('nexo-aio-downloader');
 
-// Some Example Url
-const listUrl = {
-    twitter: "https://twitter.com/x_cast_x/status/1809598797603041498?t=tXO1JdAR1Avm2BY5wNQX-w&s=19",
-    instagram: "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o",
-    facebook: "https://www.facebook.com/share/r/WsMBxDEAWcMVXCf9/?mibextid=D5vuiz",
-    tiktok: "https://vm.tiktok.com/ZSYnnbXW7",
-    "google-drive": "https://drive.google.com/file/d/1E8fOgl4nu4onGR756Lw2ZAVv6NgP1H74/view?usp=drive_link",
-    sfile: "https://sfile.mobi/5g9STNCU525"
-}
-
-(async () => {
-    // All In One For Available Sites
-    const result = await nexo.aio('any_url')
-    console.log(result)
-
-    // Instagram Downloader
-    const insta = await nexo.instagram(listUrl.instagram)
-    console.log(insta)
-
-    // Facebook Downloader
-    const fb = await nexo.facebook(listUrl.facebook)
-    console.log(insta)
-
-    // ETC....
-})()
+// AIO — auto‑detect site from URL
+const result = await nexo.aio('https://...');
+// → { creator: '@ShiroNexo', status: true, data: { ... } }
 ```
 
+---
 
-## Youtube Example
+## API Reference
 
-```js
-const nexo = require("nexo-aio-downloader");
+Every call returns a consistent shape:
 
-// Example Url
-const youtubeUrl = 'https://www.youtube.com/watch?v=oOIztBXox60'
+```ts
+// Success
+{ creator: '@ShiroNexo', status: true, data: { ... } }
 
-
-// Playlist Example
-const playlistUrl = 'https://www.youtube.com/playlist?list=PL8mG-RkN2uTzbbUgvbn2YzBLLU3wktwo0'
-
-// 1: 144p || 2: 360p || 3: 480p || 4: 720p || 5: 1080p || 6: 1440p || 7: 2160p || 8: highestaudio/mp3/audio || 9: bitrate List
-const quality = 3
-
-// Check Available Bitrate For Audio
-const bitrateList = 9
-
-// Playlist Need Directory
-// If Null Will Create New ./temp Directory
-const dirPath = './youtube'
-
-(async () => {
-    // Download Custom Quality Youtube
-    const youtube = await nexo.youtube(youtubeUrl, quality)
-    console.log(youtube)
-
-    // The Download Will Saved Into Folder
-    const youtubePlaylist = await nexo.youtubePlaylist(playlistUrl, quality, dirPath)
-    console.log(youtubePlaylist)
-
-    // Download Custom Bitrate Audio
-    const bitList = await nexo.youtube(youtubeUrl, bitrateList)
-
-    /**
-    Ouput Bitrate Example
-    {
-        "creator": "@ShiroNexo",
-        "status": "true,
-        "data": {
-            "bitrateList": [
-                {
-                    "codec": "opus",
-                    "bitrate": 160,
-                    "itag": 251
-                },
-                {
-                    "codec": "mp4a.40.2",
-                    "bitrate": 128,
-                    "itag": 140
-                },
-                // Etc...
-            ]
-        }
-    }
-    **/
-
-    const customAudio =  await nexo.youtube(youtubeUrl, 160) // (videoUrl, bitrate)
-    console.log(customAudio)
-    // ETC....
-})()
+// Error
+{ creator: '@ShiroNexo', status: false, message: 'Error description' }
 ```
 
+> `nexo.aio()` **throws** `'Unsupported site'` for unknown URLs — use try/catch.
 
-## Pixiv Example
-For R-18 works require cookie
+### `nexo.aio(url, [options])`
+
+Auto‑detects the site and routes to the correct downloader.
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `url` | `string` | Any supported site URL |
+| `options` | `object` | `{ proxy?, cookie? }` |
+
+### All Downloaders
 
 ```js
-const nexo = require("nexo-aio-downloader");
-
-// Example Url
-const pixivUrl = 'https://www.pixiv.net/en/artworks/120829610'// Support URL And IllustID
-
-//Example Batch Download
-const userUrl = 'https://www.pixiv.net/en/users/25030629' // Support URL And UserID
-const type = 'illust' // illust || manga || novels || mangaSeries || novelSeries || default was illust
-
-// You Can Use The PHPSESSID= Cookie.
-const cookie = '55511249_rVrZ0ygXjti1WfuDahh4yCDE4Qo5UUqNK' // This Just Example Cookie
-
-(async () => {
-    // Without Cookie
-    const pixiv = await nexo.pixiv(pixivUrl)
-    console.log(pixiv)
-
-    // Download using cookie
-    const pixiv18 = await nexo.pixiv(pixivUrl, cookie)
-    console.log(pixiv18)
-
-    // Download Batch
-    const pixivbatch = await nexo.pixivBatch(pixivUrl, cookie, type)
-    console.log(batch)
-})()
+nexo.instagram(url, [cookie])
+nexo.facebook(url, [proxy])
+nexo.tiktok(url)
+nexo.twitter(url)
+nexo.gdrive(url)
+nexo.sfile(url)
+nexo.pixiv(url, [cookie])
+nexo.snack(url)
+nexo.mega(url, [timeout])
+nexo.bilibili(url, [{ download, quality, cookie }])
+nexo.capcut(url, [meta])
+nexo.youtube(url, [quality])
+nexo.youtubePlaylist(url, [quality], [folderPath])
+nexo.pixivBatch(url, [cookie], [type])
+nexo.pinterest.download(url)
+nexo.pinterest.search(query, [limit])
+nexo.pinterest.profile(username)
 ```
 
-### How To Get Cookie:
-1. Login to pixiv using your account
-2. Open the developer tools (<kbd>F12</kbd>, <kbd>Ctrl+Shift+I</kbd>, or <kbd>Cmd+J</kbd>)
-3. Go to the `Application` tab
-4. Go to the `Storage` section and click on `Cookies`
-5. Look for the `PHPSESSID`
-6. Open the object, right click on value and copy your session token.
+---
 
-![PHPSESSID](https://i.ibb.co.com/ZHq7bPb/Screenshot-2024-07-24-123651.png)
+## Examples
 
+### Instagram
 
-## Bilibili Example
+Instagram often requires **login cookies** — otherwise you'll get empty data or block errors.
 
 ```js
-const nexo = require("nexo-aio-downloader");
-const fs = require("fs")
+// Without cookie (may fail)
+const result = await nexo.instagram('https://www.instagram.com/reel/ABC123/');
 
-// Example Url
-const biliUrl = 'https://www.bilibili.tv/id/video/2042507617'
-
-/**
- * Video Quality Mapping (Bilibili)
- * 
- * ID   Resolution   Notes
- *  6   => 240p       - Low quality
- * 16   => 360p       - SD
- * 32   => 480p       - SD+ (Default)
- * 64   => 720p       - HD
- * 
- * ⚠️ Requires login (cookie) for qualities below:
- * 80   => 1080p      - Full HD
- * 112  => 1080p+     - Higher bitrate
- * 116  => 4K         - UHD
- * 120  => 8K         - Ultra HD
- */
-
-const quality = '32'; // Default: 480p
-
-// Optional (for high quality/VIP video)
-const cookie = 'SESSDATA=xxxxx'
-
-(async () => {
-    const result = await bilibiliDownloader(biliUrl, {
-        download: true, // true for download video + audio, false for metadata only
-        quality,
-        cookie, 
-    });
-
-    if (result.status) {
-        console.log('Title:', result.data.title);
-        console.log('Available quality:');
-        result.data.mediaList.videoList.forEach(v => {
-            console.log(`- ${v.quality} (${v.quality_id})`);
-        });
-
-        if (result.data.result) {
-            fs.writeFileSync(`${result.data.title}.mp4`, result.data.result);
-            console.log('✅ Video saved succesfully!');
-        } else {
-            console.log('📄 Mode metadata-only, no downloading video.');
-        }
-    } else {
-        console.error('❌ Gagal:', result.message);
-    }
-})();
+// With cookie (recommended)
+const result = await nexo.instagram('https://www.instagram.com/p/ABC123/', 'sessionid=xxxx-xxxx');
+// Or via aio
+const result = await nexo.aio('https://www.instagram.com/p/ABC123/', {
+    cookie: 'sessionid=xxxx-xxxx; csrftoken=xxxx; ds_user_id=xxxx',
+});
 ```
 
-## PINTEREST Example
+**How to get Instagram cookie:**
+1. Login to instagram.com in your browser
+2. Press F12 → **Application** → **Cookies** → `instagram.com`
+3. Copy values for: `sessionid`, `csrftoken`, `ds_user_id`
+4. Combine them: `sessionid=...; csrftoken=...; ds_user_id=...`
 
-```js
-const nexo = require("nexo-aio-downloader");
-
-// Example Url
-const pinUrl = 'https://id.pinterest.com/pin/774124930087393/'
-
-(async () => {
-    // Download Pinterest
-    const pinDownload = await nexo.pinterest.download(pinUrl)
-    console.log(pinDownload)
-
-    // Pinterest Search
-    // Size optional
-    const pinSearch = await nexo.pinterest.search('cat', 10)
-    console.log(pinSearch)
-
-    // Pinterest Profile
-    const pinProfile = await nexo.pinterest.profile('anon')
-    console.log(pinProfile)
-})()
+**Return data:**
+```ts
+{ url: string[], caption: string, username: string, like: number, comment: number, isVideo: boolean }
 ```
 
-
-# Example Using Proxy
-For like instagram that have ip limit
+### Facebook
 
 ```js
-const nexo = require("nexo-aio-downloader");
+const result = await nexo.facebook('https://www.facebook.com/share/v/...');
+
+// With proxy
 const { HttpsProxyAgent } = require('https-proxy-agent');
-
-const username = 'example_user'
-const password = 'example'
-const hostname = 'ex.ample.com'
-const port = 6060
-
-const httpsProxyAgent = new HttpsProxyAgent(`http://${username}:${password}@${hostname}:${port}`); // Use HttpsProxyAgent
-
-// Some Example Url
-const url = "https://www.instagram.com/reel/C9cFHKIySEu/?igsh=NnhmdmppdHo3dm9o"
-
-(async () => {
-    // Using Proxy
-    const result = await nexo.aio(url, httpsProxyAgent)
-    console.log(result)
-})()
+const proxy = new HttpsProxyAgent('http://user:pass@host:port');
+const result = await nexo.facebook('https://fb.watch/abc123/', proxy);
 ```
+
+**Return data:**
+```ts
+{ user: string, quoted: string|null, isPrivate: boolean, result: [{ quality: 'HD'|'SD', type: string, url: string }] }
+```
+
+### TikTok
+
+```js
+const result = await nexo.tiktok('https://www.tiktok.com/@user/video/123456');
+// or short links
+const result = await nexo.tiktok('https://vm.tiktok.com/abc123/');
+```
+
+**Return data:**
+```ts
+{
+    videoId, description, createTime, videoUrl,
+    videoInfo: { size, duration, width, height, definition, coverUrl, subtitles },
+    author: { id, uniqueId, nickname, avatarThumb },
+    music: { id, title, authorName, playUrl, isOriginal },
+    stats: { likes, shares, comments, plays, collects, reposts },
+    videoBuffer: Buffer  // Downloaded buffer
+}
+```
+
+### Twitter / X
+
+```js
+const result = await nexo.twitter('https://x.com/user/status/123456789');
+```
+
+**Return data:**
+```ts
+{
+    author: string, like: number, view: number, retweet: number,
+    description: string, sensitiveContent: boolean,
+    result: [{ type: 'video'|'gif'|'image', thumb?: string, url: string }]
+}
+```
+
+### YouTube
+
+```js
+// Quality: 1=144p, 2=360p, 3=480p, 4=720p, 5=1080p, 6=1440p, 7=2160p
+//          8=bestaudio, 9=bitrateList
+
+const video = await nexo.youtube('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 4);
+// → data.result = MP4 Buffer
+
+// List available audio bitrates
+const bitrates = await nexo.youtube('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 9);
+// → data.bitrateList = [{ codec, bitrate, format_id }]
+
+// Download audio at specific bitrate
+const audio = await nexo.youtube('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 160);
+
+// Playlist
+const playlist = await nexo.youtubePlaylist(
+    'https://www.youtube.com/playlist?list=PL...',
+    4,                       // quality
+    './downloads/youtube'    // output folder (default: ./temp)
+);
+// → data = { title, resultPath: string[], metadata: [...] }
+```
+
+**Return data (video/audio):**
+```ts
+{ title, result: Buffer, size, quality, desc, views, likes, channel, uploadDate, thumb, type }
+```
+
+### Google Drive
+
+```js
+const result = await nexo.gdrive('https://drive.google.com/file/d/FILE_ID/view');
+```
+
+**Return data:**
+```ts
+{ filename: string, filesize: string, result: Buffer }
+```
+
+### Sfile
+
+```js
+const result = await nexo.sfile('https://sfile.mobi/FILEKEY');
+```
+
+**Return data:**
+```ts
+{ filename: string, filesize: string, mimetype: string, result: Buffer }
+```
+
+### Pixiv
+
+```js
+// SFW (no cookie)
+const sfw = await nexo.pixiv('https://www.pixiv.net/en/artworks/120829610');
+// → data.result = [{ type: 'png'|'gif', buffer }]
+
+// With cookie (R‑18, Ugoira/GIF)
+const r18 = await nexo.pixiv('https://www.pixiv.net/en/artworks/...', 'your_PHPSESSID');
+
+// Batch download all works from a user
+const batch = await nexo.pixivBatch(
+    'https://www.pixiv.net/en/users/25030629',
+    'your_PHPSESSID',
+    'illust' // illust | manga | novels | mangaSeries | novelSeries
+);
+// → data = array of artwork results
+```
+
+**How to get PHPSESSID:**
+1. Login to pixiv.net
+2. F12 → Application → Cookies → `www.pixiv.net`
+3. Copy the `PHPSESSID` value
+
+**Return data:**
+```ts
+{ title, alt, user, desc, like, view, comment, tags, result: [{ type, buffer }] }
+```
+
+### Bilibili
+
+```js
+const result = await nexo.bilibili('https://www.bilibili.tv/id/video/2042507617', {
+    download: true,     // true = return MP4 buffer, false = metadata only
+    quality: '64',      // 16=360p, 32=480p (default), 64=720p
+    cookie: 'SESSDATA=xxxxx',  // optional, needed for 1080p+
+});
+
+if (result.status && result.data.result) {
+    require('fs').writeFileSync(`${result.data.title}.mp4`, result.data.result);
+}
+```
+
+**Return data:**
+```ts
+{
+    title, locate, description, type, cover, views, like,
+    result: Buffer|null,  // null when download: false
+    mediaList: { videoList: [{ quality, quality_id, url }], audioList: [{ size, url }] }
+}
+```
+
+### CapCut
+
+```js
+const result = await nexo.capcut('https://www.capcut.com/t/abc123', true);
+// meta=true (default) includes extra metadata like author, likes, play count
+```
+
+### Snack
+
+```js
+const result = await nexo.snack('https://www.snack.com/video/abc123');
+```
+
+**Return data:**
+```ts
+{ author, description, transcript, thumbnailUrl, uploadDate, comment, audio, result: string (contentUrl) }
+```
+
+### Mega
+
+```js
+const result = await nexo.mega('https://mega.nz/file/abc123#decryptionKey');
+```
+
+**Return data:**
+```ts
+{ fileName: string, fileSize: number, downloadLink: string }
+```
+
+### Pinterest
+
+```js
+// Pin metadata + media
+const pin = await nexo.pinterest.download('https://id.pinterest.com/pin/774124930087393/');
+
+// Search (max 50)
+const search = await nexo.pinterest.search('cats', 10);
+
+// User profile
+const profile = await nexo.pinterest.profile('username');
+```
+
+---
+
+## Using a Proxy
+
+```js
+const { HttpsProxyAgent } = require('https-proxy-agent');
+const proxy = new HttpsProxyAgent('http://user:pass@host:port');
+
+// Via aio
+await nexo.aio('https://www.facebook.com/...', { proxy });
+
+// Direct
+await nexo.facebook('https://www.facebook.com/...', proxy);
+```
+
+---
+
+## Requirements
+
+| Dependency | Needed For |
+|------------|-----------|
+| **Python 3.7+** + `yt-dlp` | YouTube only |
+| **ffmpeg** (in PATH) | YouTube & Bilibili video/audio merging |
+
+> If `ffmpeg-static` is installed by npm, it's used automatically. Otherwise the system `ffmpeg` is used.
+
+---
 
 ## License
 
-nexo-aio-downloader is licensed under the [MIT License](https://opensource.org/licenses/MIT). Please refer to the LICENSE file for more information.
+MIT © [ShiroNexo](https://github.com/ShiroNexo)
